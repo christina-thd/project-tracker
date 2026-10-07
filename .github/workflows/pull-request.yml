@@ -25,11 +25,7 @@ jobs:
         run: |
           version_of() { sed -nE 's/^version:[[:space:]]*"?([^"[:space:]]+)"?.*/\1/p'; }
           new=$(version_of < project-tracker/config.yaml)
-          old=$( (git show "$BASE_SHA:project-tracker/config.yaml" 2>/dev/null || true) | version_of)
-          if [ -z "$old" ]; then
-            echo "No add-on on $BASE yet: $new is the first version."
-            exit 0
-          fi
+          old=$(git show "$BASE_SHA:project-tracker/config.yaml" | version_of)
           echo "main: $old, this pull request: $new"
           if [ "$new" = "$old" ]; then
             echo "::error file=project-tracker/config.yaml::The version is still $old, the same as on $BASE. Raise it in config.yaml and package.json, and add it to CHANGELOG.md, or Home Assistant won't offer the update."
