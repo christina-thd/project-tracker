@@ -1,0 +1,43 @@
+project-tracker/                   Home Assistant add-on containing the app
+                                   (in the repository it sits next to repository.yaml and the repo README)
+├── config.yaml                    add-on definition: version, ingress (port 3200), optional direct port
+├── Dockerfile                     Home Assistant base image + Node.js, copies src/ and public/
+├── run.sh                         bashio: sets STATE_FILE and PORT, starts the server
+├── README.md                      add-on store page: features, install
+├── DOCS.md                        add-on Documentation tab: people, lists, adding, projects, phone and PC
+├── CHANGELOG.md                   release notes (shown in Home Assistant)
+├── icon.png, logo.png             add-on store icon (128×128) and banner (250×100)
+├── art/                           store-logo.svg, render.sh (PNG images from the SVGs)
+├── package.json                   version, scripts (start, dev, test, lint, typecheck, check), dev tools only
+├── eslint.config.js               lint rules (npm run lint)
+├── tsconfig.json                  type checking of the JavaScript from JSDoc, nothing compiled (npm run typecheck)
+├── src/                           server (Node, no framework, no dependencies)
+│   ├── server.js                  entry point: http, graceful shutdown
+│   ├── config.js                  environment variables (PORT, HOST, STATE_FILE)
+│   ├── app.js                     HTTP routes: page, static files, API
+│   ├── tracker/state.js           state shape, repairing saved data, view for screens
+│   ├── tracker/actions.js         every action, validated
+│   ├── store.js                   safe JSON saving (atomic, debounced)
+│   ├── sse.js                     live updates to all screens
+│   └── static.js                  safe static file serving
+├── public/                        browser (plain ES modules, no build step)
+│   ├── index.html                 the page (markup only)
+│   ├── manifest.webmanifest       "Add to Home Screen" opens it like an app
+│   ├── css/   base.css, tracker.css
+│   ├── img/   logo.svg, icon-180/192/512.png
+│   └── js/
+│       ├── app.js                 entry: latest view, who and what you're looking at, home screen ↔ projects, wiring
+│       ├── shared/  tracker.js (statuses, limits, colors, emoji; used by the server too), api, dom, format, storage
+│       ├── ui/      back, sheet, emoji-picker, viewport, toast, icons
+│       └── tracker/ home (who's this?), person-sheet, board, switcher, add-sheet, item-sheet, project-sheet
+├── test/                          automated tests (Node's built-in runner, no extra deps):
+│                                  actions, state, store, http, addon packaging
+└── docs/
+    ├── DEVELOPMENT.md             dev setup, architecture, releasing, local Docker test
+    └── _project_architecture.txt  this overview
+
+Next to it in the repository: repository.yaml and README.md (the add-on repository, with screenshots from images/),
+.github/workflows/pull-request.yml
+(version goes up; lint, types and tests), .gitignore, .gitattributes (Unix line endings for the container files)
+
+Not in the repository: node_modules/ (npm install), data/ (local saved tracker)

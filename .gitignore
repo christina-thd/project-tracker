@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Local tracker data (the saved projects and items, written by the dev server)
+project-tracker/data/
+
+# Secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local tooling
+.claude/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

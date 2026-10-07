@@ -1,0 +1,476 @@
+/* The tracker: header and project switcher, status tabs and columns, items, the + button, and the sheets' contents. */
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--safe-top) + 10px) 12px calc(92px + var(--safe-bottom));   /* room below for the + button */
+}
+
+/* ----- header ----- */
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 4px 6px;
+}
+.top h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.top-summary { margin: 0 0 0 auto; color: var(--muted); font-size: 12px; }
+/* the live connection has been down a few seconds (js/app.js): changes from other screens won't show until it's back */
+.offline-badge {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgb(251 191 36 / 0.12);
+  color: var(--test);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.offline-badge svg.icon { width: 13px; height: 13px; }
+body.offline .offline-badge { display: inline-flex; }
+
+/* ----- home: who's this? (js/tracker/home.js) ----- */
+
+.home-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding-top: 8vh;
+  text-align: center;
+}
+.home-view h1 { margin: 10px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.home-tagline { max-width: 320px; margin: 0 0 18px; color: var(--muted); }
+.people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+.person {
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: border-color 160ms, background 160ms;
+}
+.person.selected { border-color: rgb(139 156 255 / 0.55); }
+.person:active { background: var(--surface-2); }
+@media (hover: hover) { .person:hover { background: var(--surface-2); } }
+.person-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 22px 12px 16px;
+}
+.person-emoji {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  font-size: 34px;
+  line-height: 1;
+}
+.person-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 700; }
+.person-summary { color: var(--muted); font-size: 12px; }
+.person-edit { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 36px; height: 36px; color: var(--faint); }
+
+/* whose projects: the person's emoji, top right; back to the home screen */
+.person-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  font-size: 18px;
+  line-height: 1;
+}
+.person-button:active { transform: scale(0.92); }
+/* ----- the project you're on: tap to switch (js/tracker/switcher.js) ----- */
+
+.project-title { display: flex; flex: 0 1 auto; min-width: 0; }
+.project-button {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;                                  /* a long name shrinks to "…" instead of pushing the counts off */
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 -4px -6px;                      /* the emoji lines up with the content below; the padding is tap room */
+  padding: 4px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+.project-button:active { background: var(--surface-2); }
+.project-button .project-emoji { font-size: 19px; }
+.project-button-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-button svg.icon { width: 16px; height: 16px; color: var(--muted); stroke-width: 2.2; }
+@media (hover: hover) { .project-button:hover { background: var(--surface-2); } }
+
+/* ----- project list ----- */
+
+.switch-search { padding: 0 14px 8px; }
+.switch-search .text-input { height: 38px; }
+.switch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+  overflow-y: auto;
+}
+.switch-row { display: flex; align-items: center; border-radius: 11px; }
+.switch-row.selected { background: var(--surface-2); }
+.switch-pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 6px 4px 6px 12px;
+  text-align: left;
+}
+.switch-text { display: flex; flex-direction: column; min-width: 0; }
+.switch-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 600; }
+.switch-counts { display: flex; gap: 10px; color: var(--faint); font-size: 12px; }
+.count-todo { color: var(--todo); }
+.count-test { color: var(--test); }
+.switch-current {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(139 156 255 / 0.14);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+.switch-edit { display: grid; place-items: center; flex: none; width: 44px; height: 44px; color: var(--faint); }
+.switch-edit:active { color: var(--ink); }
+.switch-empty { margin: 0; padding: 24px 12px; color: var(--faint); text-align: center; }
+.switch-foot { padding: 10px 14px calc(16px + var(--safe-bottom)); border-top: 1px solid var(--line); margin-top: 8px; }
+.switch-foot .pill { width: 100%; }
+/* ----- status tabs (phones) and columns ----- */
+
+.status-tabs {
+  position: sticky;
+  top: calc(var(--safe-top) + 6px);
+  z-index: 5;
+  margin-top: 10px;
+  padding: 3px;
+  box-shadow: 0 8px 20px -6px var(--bg);
+}
+.status-tabs > button { min-height: 30px; }
+.status-tabs .count:not(:empty) { font-size: 11px; opacity: 0.75; }
+
+.board { margin-top: 14px; }
+.column { display: none; }
+.column.current { display: block; }
+
+.column-head {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  min-height: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.column-label { display: inline-flex; align-items: center; gap: 8px; }
+.column-head .count { color: var(--faint); }
+.column-dot { display: grid; color: var(--status); }   /* holds the status icon (js/ui/icons.js) */
+.column-dot svg.icon { width: 16px; height: 16px; stroke-width: 2; }
+.column[data-status="todo"] { --status: var(--todo); }
+.column[data-status="test"] { --status: var(--test); }
+.column[data-status="done"] { --status: var(--done); }
+
+/* phones: the Done tab still needs its Clear button */
+.column[data-status="done"] .column-head:has(.clear-done:not([hidden])) { display: flex; }
+.column[data-status="done"] .column-label { display: none; }
+
+.clear-done {
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.clear-done.armed { border-color: rgb(248 113 113 / 0.5); color: var(--danger); }
+
+/* wide screens (PC, tablet in landscape): the three columns side by side, no tabs */
+@media (min-width: 900px) {
+  .app { padding-left: 28px; padding-right: 28px; }
+  .status-tabs { display: none; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+    margin-top: 20px;
+  }
+  .column, .column.current {
+    display: block;
+    padding: 12px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: rgb(20 24 33 / 0.55);
+  }
+  .column-head, .column[data-status="done"] .column-head { display: flex; padding: 0 4px; }
+  .column[data-status="done"] .column-label { display: inline-flex; }
+  .item:hover { background: var(--surface-2); }
+}
+
+/* ----- items ----- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  border-left: 3px solid hsl(var(--hue) 80% 68%);   /* the project's color */
+  background: var(--surface);
+  cursor: pointer;
+  transition: background 160ms;
+}
+.item:active { background: var(--surface-2); }
+.item.arrived { animation: rise 220ms var(--ease) both; }   /* just added or moved here (js/tracker/board.js) */
+
+.advance {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: -3px 0 -3px;                           /* lines up with the first line of text */
+  border-radius: 50%;
+  color: var(--status);
+  transition: background 160ms, transform 120ms var(--ease);
+}
+/* a bigger tap area than it looks, so the small button is still easy to hit */
+button.advance { position: relative; }
+button.advance::after { content: ""; position: absolute; inset: -8px; }
+.advance svg.icon { width: 19px; height: 19px; }
+button.advance:active { transform: scale(0.85); background: var(--surface-3); }
+.advance.done { background: rgb(52 211 153 / 0.14); }
+.advance.done svg.icon { width: 15px; height: 15px; stroke-width: 2.6; }
+
+.item-body { flex: 1; min-width: 0; }
+.item-text { margin: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.column[data-status="done"] .item-text { color: var(--muted); }
+
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  margin-top: 2px;
+  color: var(--faint);
+  font-size: 11px;
+}
+.has-note { display: grid; }
+.has-note svg.icon { width: 12px; height: 12px; }
+
+.empty {
+  margin: 0;
+  padding: 32px 12px;
+  color: var(--faint);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ----- first run ----- */
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18vh 24px 40px;
+  text-align: center;
+}
+.welcome h2 { margin: 14px 0 0; font-size: 22px; }
+.welcome p { max-width: 340px; margin: 0 0 18px; color: var(--muted); }
+
+/* ----- the round + at the bottom right: opens the add sheet ----- */
+
+.fab {
+  position: fixed;
+  right: max(16px, calc((100% - 1240px) / 2 + 16px));
+  bottom: calc(18px + var(--safe-bottom));
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(var(--hue, 230) 85% 74%), var(--accent-strong));
+  color: var(--accent-ink);
+  box-shadow: 0 10px 28px -8px var(--glow), 0 2px 6px rgb(0 0 0 / 0.4);
+  transition: transform 140ms var(--ease);
+}
+.fab svg.icon { width: 26px; height: 26px; stroke-width: 2.4; }
+.fab:active { transform: scale(0.92); }
+
+/* ----- add sheet ----- */
+
+.add-sheet .sheet-title { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.add-sheet .sheet-title span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.add-row { display: flex; gap: 8px; }
+.add-row .text-input { flex: 1; min-width: 0; }
+.add-send {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink);
+}
+.add-send svg.icon { width: 20px; height: 20px; stroke-width: 2.4; }
+.add-send:active { transform: scale(0.94); }
+.add-hint { margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
+
+/* ----- sheets' contents ----- */
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 8px;
+}
+.sheet-title { flex: 1; margin: 0; font-size: 16px; font-weight: 700; }
+.sheet-close { margin-left: auto; padding: 6px 4px; color: var(--accent); font-size: 14px; font-weight: 600; }
+
+.sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 14px calc(18px + var(--safe-bottom));
+  overflow-y: auto;
+}
+.sheet-body > * { flex-shrink: 0; }              /* on short screens it scrolls instead of squashing the fields */
+
+/* item sheet: which project it's in (shown, not changed there) */
+.item-project {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.item-project .project-emoji { font-size: 16px; }
+.item-project span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.item-text-input {
+  width: 100%;
+  padding: 4px 0 6px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  resize: none;
+  overflow: hidden;
+}
+.item-text-input:focus-visible { outline: none; border-bottom-color: var(--line); }
+
+.item-note-input, .text-input {
+  width: 100%;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 16px;                               /* 16px or more: iPhones don't zoom in when it's focused */
+}
+.item-note-input { min-height: 80px; padding: 10px 12px; line-height: 1.4; resize: none; overflow: hidden; }
+.text-input { height: 42px; padding: 0 13px; }
+.item-note-input:focus-visible, .text-input:focus-visible { outline: none; border-color: var(--accent); }
+.item-note-input::placeholder, .text-input::placeholder { color: var(--faint); }
+
+.item-dates { margin: 0; color: var(--faint); font-size: 11px; }
+#itemDelete { align-self: flex-start; }
+
+.project-emoji { flex: none; font-size: 18px; line-height: 1; font-weight: 400; }
+.switch-pick .project-emoji { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-3); font-size: 19px; }
+
+.name-row { display: flex; align-items: center; gap: 10px; }
+.name-row .text-input { flex: 1; min-width: 0; }
+.emoji-current {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--surface-3);
+  font-size: 22px;
+}
+.settings-label { margin: 2px 2px -4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.emojis { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 4px; }
+.emoji {
+  display: grid;
+  place-items: center;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 20px;
+  transition: background 140ms, transform 120ms var(--ease);
+}
+.emoji.selected { background: var(--surface-3); box-shadow: inset 0 0 0 2px var(--accent); }
+.emoji:active { transform: scale(0.88); }
+.emoji-custom { height: 38px; font-size: 16px; }
+
+.hues { display: flex; flex-wrap: wrap; gap: 10px; padding: 2px; }
+.hue {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: hsl(var(--hue) 80% 68%);
+  transition: box-shadow 160ms, transform 120ms var(--ease);
+}
+.hue.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px hsl(var(--hue) 80% 68%); }
+.hue:active { transform: scale(0.9); }
+
+.pill.ghost.armed { border-color: rgb(248 113 113 / 0.5); color: var(--danger); }
+
+.project-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}

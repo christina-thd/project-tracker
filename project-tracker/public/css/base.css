@@ -1,0 +1,238 @@
+/* Shared by every part of the page: theme, reset, buttons, segmented controls, sheets, toast. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0b0d12;
+  --surface: #141821;
+  --surface-2: #1a1f2b;
+  --surface-3: #242b3a;
+  --line: #2a3142;
+  --ink: #e8ecf4;
+  --muted: #95a0b5;
+  --faint: #5d677c;
+  --accent: #8b9cff;
+  --accent-strong: #6d7cf7;
+  --accent-ink: #0d1022;
+  --glow: rgb(109 124 247 / 0.45);
+  --danger: #f87171;
+
+  /* one color per status */
+  --todo: #8b9cff;
+  --test: #fbbf24;
+  --done: #34d399;
+
+  --radius: 14px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --font-body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  /* the top of the screen kept free above sheets, for messages (js/ui/toast.js): 16px + up to two lines + a gap */
+  --toast-room: 86px;
+  /* the part of the screen you can see (smaller while the keyboard is open), kept up to date by js/ui/viewport.js */
+  --viewport-top: 0px;
+  --viewport-height: 100dvh;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* no double-tap zoom (iPhone zooms on two quick taps); pinch zoom still works */
+html { background: var(--bg); touch-action: manipulation; }
+
+body {
+  min-height: 100dvh;
+  margin: 0;
+  background:
+    radial-gradient(120% 50% at 50% -14%, rgb(109 124 247 / 0.22), transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--ink);
+  font: 14px/1.4 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+body.locked { overflow: hidden; }
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { border: 0; background: none; padding: 0; cursor: pointer; touch-action: manipulation; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+svg.icon { width: 1.2em; height: 1.2em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ----- pill buttons ----- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  font-weight: 600;
+  font-size: 13.5px;
+  transition: transform 120ms var(--ease), background 160ms;
+}
+.pill:active { transform: scale(0.97); }
+.pill.primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: var(--accent-ink); box-shadow: 0 6px 20px -8px var(--glow); }
+.pill.ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+.pill.danger { background: transparent; border: 1px solid rgb(248 113 113 / 0.35); color: var(--danger); }
+.pill.danger.armed { background: var(--danger); color: #1f0a0a; border-color: transparent; }
+
+/* ----- segmented control: a row of buttons, one of them .selected ----- */
+
+.segmented {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);             /* equal buttons that may shrink on narrow phones */
+  grid-auto-flow: column;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.segmented > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 32px;
+  border-radius: 999px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 13px;
+  transition: color 200ms, background 200ms;
+}
+.segmented > button.selected { color: var(--accent-ink); background: var(--tab-color, var(--accent)); box-shadow: 0 4px 16px -6px var(--tab-color, var(--glow)); }
+/* status icons (js/ui/icons.js): in the status's color, dark on the colored background once selected */
+.segmented > [data-status] svg.icon { width: 15px; height: 15px; stroke-width: 2; color: var(--tab-color); transition: color 200ms; }
+.segmented > [data-status].selected svg.icon { color: currentColor; }
+.segmented > [data-status="todo"] { --tab-color: var(--todo); }
+.segmented > [data-status="test"] { --tab-color: var(--test); }
+.segmented > [data-status="done"] { --tab-color: var(--done); }
+
+/* ----- sheets: a layer with a dimmed backdrop and a panel that slides up ----- */
+
+.layer {
+  position: fixed;
+  top: var(--viewport-top);
+  left: 0;
+  right: 0;
+  height: var(--viewport-height);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+.layer + .layer { z-index: 21; }
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(3 4 8 / 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 260ms var(--ease);
+}
+
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;                              /* on a PC: a panel, not the whole width */
+  max-height: calc(var(--viewport-height) - var(--safe-top) - var(--toast-room));
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 -20px 60px -20px rgb(0 0 0 / 0.8);
+  transform: translateY(100%);
+  transition: transform 300ms var(--ease);
+  overflow: hidden;
+}
+.layer.open .backdrop { opacity: 1; }
+.layer.open .sheet { transform: none; }
+
+/* swipe down to close (js/ui/sheet.js): the sheet follows the finger while dragging */
+.sheet.dragging { transition: none; }
+[data-drag] { touch-action: none; }
+
+.grabber {
+  flex: none;
+  height: 22px;
+  cursor: grab;
+}
+.grabber::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: 9px auto 0;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+
+/* ----- toast ----- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  top: calc(16px + var(--viewport-top) + var(--safe-top));   /* always here: sheets stop below it (--toast-room) */
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  padding: 11px 18px;
+  width: max-content;                            /* one line when it fits; wraps (never cut) when it doesn't */
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--surface-3);
+  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, -12px);
+  transition: opacity 200ms, transform 240ms var(--ease);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.show.actionable { pointer-events: auto; padding-right: 6px; }
+.toast-text { overflow-wrap: anywhere; }
+.toast-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.toast-icon svg.icon { width: 13px; height: 13px; stroke-width: 2.6; }
+.toast-action {
+  margin-left: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 700;
+}
+.toast.error { border-color: rgb(248 113 113 / 0.4); color: #fecaca; }
+
+/* entrance of list items */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
