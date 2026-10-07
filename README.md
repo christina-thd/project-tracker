@@ -2,7 +2,7 @@
 
 A to-do and ready-to-test tracker for every project you're working on, as a Home Assistant add-on.
 
-Everyone in the house picks themselves on the home screen and has their own projects.
+Pick yourself on the home screen to see your own projects.
 Add a project, tap **+** to jot down what's to do, and move each item along with one tap:
 **Todo** → **Test** → **Done**. Made for phones, in portrait; on a PC the three lists sit side by side.
 
@@ -34,7 +34,7 @@ Add this repository to Home Assistant:
 Keep track of what's to do and what's ready to test, per project.
 
 **Features:**
-- Everyone in the house has their own projects: pick yourself on the home screen
+- Everyone has their own projects: pick yourself on the home screen
 - A project per thing you work on, each with its own emoji
 - Todo, Test and Done lists, with notes on any item
 - Quick add: tap +, type, press Enter, and the next one
@@ -52,7 +52,3 @@ cd project-tracker
 npm test
 npm run dev
 ```
-
-## Support
-
-For issues, check the add-on logs or open an issue in this repository.

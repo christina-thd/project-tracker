@@ -5,7 +5,7 @@ from your phone, and just as usable from a PC.
 
 ## Features
 
-- Everyone in the house has their own projects: pick yourself on the home screen
+- Everyone has their own projects: pick yourself on the home screen
 - A project per thing you work on, each with its own emoji
 - Three lists: **Todo**, **Test** and **Done**; one tap moves an item to the next
 - Quick add: tap +, type, press Enter; add several in a row
