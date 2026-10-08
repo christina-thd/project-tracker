@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import {
-  isEmoji, isHue, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue, pickPersonEmoji,
-  STATUS_IDS,
+  cleanUrl, isEmoji, isHue, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
+  pickPersonEmoji, STATUS_IDS,
 } from '../../public/js/shared/tracker.js';
 
 /**
@@ -60,6 +60,7 @@ function normalizeProject(raw, now, taken) {
     name,
     emoji: isEmoji(raw.emoji) ? raw.emoji : pickEmoji(taken, name),   // from before emoji: one its name suggests
     hue: isHue(raw.hue) ? raw.hue : pickHue(taken),
+    url: cleanUrl(raw.url) || null,                // none (or not a web address): null
     createdAt: toTime(raw.createdAt, now),
   };
 }

@@ -4,8 +4,10 @@
  * @typedef {'todo' | 'test' | 'done'} Status
  * @typedef {{ id: string, name: string, emoji: string, createdAt: number }} Person
  *   someone in the house: each person has their own projects (picked on the home screen; no passwords)
- * @typedef {{ id: string, personId: string, name: string, emoji: string, hue: number, createdAt: number }} Project
- *   emoji: what marks the project (header, project list); hue: its color (item stripe, the + button)
+ * @typedef {{ id: string, personId: string, name: string, emoji: string, hue: number, url: string | null,
+ *   createdAt: number }} Project
+ *   emoji: what marks the project (header, project list); hue: its color (item stripe, the + button);
+ *   url: its repository (e.g. on GitHub), opened from the header; null when it has none
  * @typedef {{ id: string, projectId: string, text: string, note: string, status: Status,
  *   createdAt: number, movedAt: number }} Item
  *   movedAt: when it got its current status (lists show the latest first)
@@ -29,6 +31,7 @@ export function nextStatus(status) {
 }
 
 export const MAX_NAME = 40;
+export const MAX_URL = 300;
 export const MAX_PEOPLE = 20;
 export const MAX_TEXT = 300;
 export const MAX_NOTE = 2000;
@@ -48,6 +51,53 @@ function leastUsed(choices, taken) {
 
 /** The first color no project has yet (or the least used one). */
 export const pickHue = (projects) => leastUsed(HUES, projects.map((p) => p.hue));
+
+// ----- a project's link (its repository) -----
+
+/**
+ * A project's link, as typed or pasted: '' for none, the full address for a web address (https:// is added when it's
+ * left out, as in "github.com/you/repo"), or null when it isn't one.
+ * @param {unknown} value
+ */
+export function cleanUrl(value) {
+  if (value == null) return '';
+  if (typeof value !== 'string') return null;
+  const text = value.trim();
+  if (!text) return '';
+  const full = /^[a-z][a-z0-9+.-]*:/i.test(text) ? text : `https://${text}`;
+  let url;
+  try {
+    url = new URL(full);
+  } catch {
+    return null;
+  }
+  const web = (url.protocol === 'https:' || url.protocol === 'http:') && url.hostname.includes('.');
+  return web && url.href.length <= MAX_URL ? url.href : null;
+}
+
+/** A short form of a link for showing it: host and path, without https:// or a trailing slash. */
+export const shortUrl = (url) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+const GITHUB = /^(?:https?:\/\/)?(?:www\.)?github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?(?:[?#].*)?$/i;
+const OWNER_REPO = /^([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/;
+
+/**
+ * The project sheet's GitHub field, as typed after "github.com/": "you/project", or a whole GitHub link pasted in.
+ * Gives the repo's address, '' for none, or null when it isn't a GitHub repo.
+ * @param {unknown} value
+ */
+export function githubUrl(value) {
+  const text = typeof value === 'string' ? value.trim() : '';
+  if (!text) return '';
+  const match = GITHUB.exec(text) ?? OWNER_REPO.exec(text.replace(/^github\.com\//i, ''));
+  return match ? `https://github.com/${match[1]}/${match[2]}` : null;
+}
+
+/** A GitHub repo's "owner/repo" (for the field), or null for any other link. */
+export function githubRepo(url) {
+  const match = url ? GITHUB.exec(url) : null;
+  return match ? `${match[1]}/${match[2]}` : null;
+}
 
 // ----- people -----
 

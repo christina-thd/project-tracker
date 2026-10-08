@@ -65,7 +65,8 @@ to every screen over `GET /api/events` (Server-Sent Events). Screens never chang
 only render the latest view.
 
 **Actions:** `addPerson`, `renamePerson`, `setPersonEmoji`, `removePerson` (with their projects), `addProject`
-(for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `removeProject` (with its items), `addItem`,
+(for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `setProjectUrl` (its repo link: any web address, `cleanUrl`; the
+project sheet takes a GitHub repo, `githubUrl` / `githubRepo` in `public/js/shared/tracker.js`), `removeProject` (with its items), `addItem`,
 `editItem`, `setStatus`, `removeItem`, `clearDone`. See `src/tracker/actions.js`. Statuses are `todo`, `test` and
 `done` (`STATUSES` in `public/js/shared/tracker.js`); `movedAt` records when an item got its status, and lists show
 the latest first.

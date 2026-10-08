@@ -1,6 +1,6 @@
 import {
-  isEmoji, isHue, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue, pickPersonEmoji,
-  STATUS_IDS,
+  cleanUrl, isEmoji, isHue, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
+  pickPersonEmoji, STATUS_IDS,
 } from '../../public/js/shared/tracker.js';
 import { cleanText, findItem, findPerson, findProject, newId, sameName } from './state.js';
 
@@ -51,6 +51,13 @@ function uniqueName(others, value, what, exceptId = null) {
 const projectName = (state, personId, value, exceptId = null) =>
   uniqueName(state.projects.filter((p) => p.personId === personId), value, 'a project', exceptId);
 
+/** A project's link: the full address, or null for none ('' or null clears it). */
+function projectUrl(value) {
+  const url = cleanUrl(value);
+  if (url === null) throw new ActionError('url must be a web address, like https://github.com/you/project');
+  return url || null;
+}
+
 function emojiOrNull(emoji) {
   if (emoji != null && !isEmoji(emoji)) throw new ActionError('emoji must be a single emoji');
   return emoji ?? null;
@@ -94,7 +101,7 @@ const handlers = {
   },
 
   /** Adds a project for someone, with the emoji and color given, or ones picked for it (see pickEmoji, pickHue). */
-  addProject(state, { personId, name, emoji, hue }, now) {
+  addProject(state, { personId, name, emoji, hue, url }, now) {
     getPerson(state, personId);
     if (state.projects.length >= MAX_PROJECTS) throw new ActionError(`At most ${MAX_PROJECTS} projects`);
     if (hue != null && !isHue(hue)) throw new ActionError('hue must be a whole number from 0 to 359');
@@ -106,6 +113,7 @@ const handlers = {
       name: clean,
       emoji: emojiOrNull(emoji) ?? pickEmoji(theirs, clean),
       hue: hue ?? pickHue(theirs),
+      url: projectUrl(url),
       createdAt: now,
     };
     state.projects.push(project);
@@ -121,6 +129,11 @@ const handlers = {
   renameProject(state, { projectId, name }) {
     const project = getProject(state, projectId);
     project.name = projectName(state, project.personId, name, project.id);
+  },
+
+  /** A project's link (e.g. its GitHub repository); empty clears it. */
+  setProjectUrl(state, { projectId, url }) {
+    getProject(state, projectId).url = projectUrl(url);
   },
 
   setProjectHue(state, { projectId, hue }) {

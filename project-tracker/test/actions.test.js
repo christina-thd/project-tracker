@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  EMOJIS, firstEmoji, HUES, isEmoji, MAX_ITEMS, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, nextStatus, PERSON_EMOJIS, pickEmoji,
+  cleanUrl, EMOJIS, firstEmoji, githubRepo, githubUrl, HUES, isEmoji, MAX_ITEMS, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, nextStatus, PERSON_EMOJIS, pickEmoji,
 } from '../public/js/shared/tracker.js';
 import { ACTION_TYPES, ActionError, applyAction } from '../src/tracker/actions.js';
 import { createInitialState } from '../src/tracker/state.js';
@@ -231,10 +231,51 @@ test('there is a limit on projects and items', () => {
   act(state, { type: 'addItem', projectId, text: 'Room again' });
 });
 
+test('a project can link to its repo: added, changed, cleared; only web addresses', () => {
+  const state = withPerson();
+  const { projectId } = act(state, { type: 'addProject', name: 'Site', url: ' github.com/me/site ' });
+  assert.equal(state.projects[0].url, 'https://github.com/me/site');
+  act(state, { type: 'addProject', name: 'No link' });
+  assert.equal(state.projects[1].url, null);
+  act(state, { type: 'setProjectUrl', projectId, url: 'https://gitlab.com/me/site' });
+  assert.equal(state.projects[0].url, 'https://gitlab.com/me/site');
+  act(state, { type: 'setProjectUrl', projectId, url: '' });
+  assert.equal(state.projects[0].url, null);
+  for (const url of ['javascript:alert(1)', 'not a link', 'ftp://example.com/x', 42]) {
+    rejects(state, { type: 'setProjectUrl', projectId, url });
+  }
+  rejects(state, { type: 'addProject', name: 'Bad', url: 'nope' });
+  rejects(state, { type: 'setProjectUrl', projectId: 'abc', url: '' }, 404);
+});
+
+test('cleanUrl: adds https://, keeps http(s) web addresses, empty for none, null for anything else', () => {
+  assert.equal(cleanUrl('github.com/me/repo'), 'https://github.com/me/repo');
+  assert.equal(cleanUrl('http://192.168.1.10:8123/x'), 'http://192.168.1.10:8123/x');
+  assert.equal(cleanUrl('  '), '');
+  assert.equal(cleanUrl(null), '');
+  for (const bad of ['localhost', 'mailto:me@example.com', 'data:text/html,hi', `https://example.com/${'x'.repeat(300)}`]) {
+    assert.equal(cleanUrl(bad), null, bad);
+  }
+});
+
+test('the GitHub field: you/project or a pasted link, back to you/project for showing', () => {
+  for (const typed of ['you/project', ' you/project/ ', 'github.com/you/project', 'https://github.com/you/project',
+    'https://www.github.com/you/project.git', 'https://github.com/you/project?tab=readme']) {
+    assert.equal(githubUrl(typed), 'https://github.com/you/project', typed);
+  }
+  assert.equal(githubUrl(''), '');
+  for (const bad of ['project', 'https://gitlab.com/you/project', 'you/project/tree/main', 'a b/c']) {
+    assert.equal(githubUrl(bad), null, bad);
+  }
+  assert.equal(githubRepo('https://github.com/you/project'), 'you/project');
+  assert.equal(githubRepo('https://gitlab.com/you/project'), null);
+  assert.equal(githubRepo(null), null);
+});
+
 test('the actions are the ones the docs list', () => {
   assert.deepEqual([...ACTION_TYPES].sort(), ['addItem', 'addPerson', 'addProject', 'clearDone', 'editItem', 'removeItem',
     'removePerson', 'removeProject', 'renamePerson', 'renameProject', 'setPersonEmoji', 'setProjectEmoji', 'setProjectHue',
-    'setStatus']);
+    'setProjectUrl', 'setStatus']);
 });
 
 test('unknown or malformed actions are rejected', () => {

@@ -15,7 +15,7 @@ test('a saved tracker comes back as it was', () => {
   const saved = {
     schema: SCHEMA_VERSION,
     people: [{ id: 'ab', name: 'Chris', emoji: '🦊', createdAt: NOW - 20 }],
-    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, createdAt: NOW - 10 }],
+    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', createdAt: NOW - 10 }],
     items: [{ id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', createdAt: NOW - 5, movedAt: NOW - 1 }],
   };
   assert.deepEqual(normalizeState(structuredClone(saved), NOW), saved);
@@ -104,6 +104,18 @@ test('ids must be text; names stay unique (projects: per person); limits are kep
   assert.equal(state.projects.length, MAX_PROJECTS);
   assert.equal(state.items.filter((i) => i.id === 'd1').length, 1);
   assert.ok(state.items.every((i) => typeof i.id === 'string'));
+});
+
+test('a project link is kept when it is a web address, else dropped', () => {
+  const state = normalizeState({
+    people: [{ id: 'a1', name: 'Chris' }],
+    projects: [
+      { id: 'aa', personId: 'a1', name: 'One', url: 'github.com/me/one' },
+      { id: 'bb', personId: 'a1', name: 'Two', url: 'javascript:alert(1)' },
+      { id: 'cc', personId: 'a1', name: 'Three' },
+    ],
+  }, NOW);
+  assert.deepEqual(state.projects.map((p) => p.url), ['https://github.com/me/one', null, null]);
 });
 
 test('the view carries the app version', () => {

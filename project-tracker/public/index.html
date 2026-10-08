@@ -34,6 +34,7 @@
       <header class="top">
         <!-- the project you're on: tap to switch (js/tracker/switcher.js) -->
         <h1 class="project-title"><span id="appName">Projects</span><button type="button" class="project-button" id="projectButton" aria-haspopup="dialog" hidden></button></h1>
+        <a class="repo-link" id="repoLink" target="_blank" rel="noopener noreferrer" hidden></a>
         <span class="offline-badge" id="offline" title="Not connected to Home Assistant: changes from other screens show up once it's back"></span>
         <p class="top-summary" id="summary"></p>
         <!-- whose projects these are: tap to go back to the home screen and switch person -->
@@ -190,6 +191,7 @@
           <span class="emoji-current" id="projectEmoji" aria-hidden="true"></span>
           <input type="text" class="text-input" id="projectName" maxlength="40" enterkeyhint="done" placeholder="Project name" aria-label="Project name">
         </div>
+
         <p class="settings-label">Emoji</p>
         <div class="emojis" id="projectEmojis" role="radiogroup" aria-label="Emoji"></div>
         <label class="settings-label" for="projectEmojiCustom">Not in the list?</label>
@@ -197,6 +199,13 @@
           placeholder="Use your emoji keyboard 😀">
         <p class="settings-label">Color</p>
         <div class="hues" id="projectHues" role="radiogroup" aria-label="Color"></div>
+        <label class="settings-label" for="projectUrl">GitHub repo (optional)</label>
+        <div class="repo-field">
+          <span class="repo-prefix" aria-hidden="true">github.com/</span>
+          <input type="text" id="projectUrl" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false"
+            enterkeyhint="done" placeholder="you/project">
+          <a class="repo-open" id="projectUrlOpen" target="_blank" rel="noopener noreferrer" hidden>Open</a>
+        </div>
         <button type="submit" class="pill primary" id="projectSave"></button>
         <div class="project-extra" id="projectExtra">
           <button type="button" class="pill ghost" id="projectClear"></button>

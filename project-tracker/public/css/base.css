@@ -62,6 +62,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 [hidden] { display: none !important; }
 
 svg.icon { width: 1.2em; height: 1.2em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+svg.icon-filled { fill: currentColor; stroke: none; }
 
 /* ----- pill buttons ----- */
 

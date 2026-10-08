@@ -119,6 +119,21 @@ body.offline .offline-badge { display: inline-flex; }
 .project-button .project-emoji { font-size: 19px; }
 .project-button-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-button svg.icon { width: 16px; height: 16px; color: var(--muted); stroke-width: 2.2; }
+
+/* the project's repo (when it has a link): </> next to its name, opens it in a new tab */
+.repo-link {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.repo-link svg.icon { width: 16px; height: 16px; stroke-width: 2.2; }
+.repo-link:active { background: var(--surface-3); color: var(--ink); }
+@media (hover: hover) { .repo-link:hover { color: var(--ink); border-color: var(--faint); } }
 @media (hover: hover) { .project-button:hover { background: var(--surface-2); } }
 
 /* ----- project list ----- */
@@ -467,6 +482,29 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .emoji.selected { background: var(--surface-3); box-shadow: inset 0 0 0 2px var(--accent); }
 .emoji:active { transform: scale(0.88); }
 .emoji-custom { height: 38px; font-size: 16px; }
+
+/* project sheet: the GitHub repo, typed after a fixed "github.com/" */
+.repo-field {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 13px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 16px;                               /* 16px or more: iPhones don't zoom in when it's focused */
+}
+.repo-field:focus-within { border-color: var(--accent); }
+.repo-prefix { flex: none; color: var(--muted); }
+.repo-field input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; font-size: inherit; }
+.repo-field input:focus-visible { outline: none; }
+.repo-field input::placeholder { color: var(--faint); }
+.repo-open { flex: none; margin-left: 8px; padding: 4px 10px; border-radius: 999px; background: var(--surface-3); color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
+
+/* project list: a row's repo, one tap away */
+.switch-repo { display: grid; place-items: center; flex: none; width: 40px; height: 44px; color: var(--muted); }
+.switch-repo svg.icon { width: 18px; height: 18px; }
+.switch-repo:active { color: var(--ink); }
 
 .hues { display: flex; flex-wrap: wrap; gap: 10px; padding: 2px; }
 .hue {

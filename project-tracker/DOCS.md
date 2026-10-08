@@ -51,8 +51,12 @@ The name at the top is the project you're on. Tap it to see all your projects (j
 with how many items each has in Todo and Test; tap one to switch to it. With more than a few projects there's a
 search field too: type part of a name and press Enter to jump to the first match.
 
-In that list, **⋯** next to a project renames it, changes its emoji or color, clears its done items, or deletes it
-(with everything in it). **New project** at the bottom adds one.
+In that list, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
+or deletes it (with everything in it). **New project** at the bottom adds one.
+
+A project with a **GitHub repo** shows GitHub's logo next to its name at the top, and on its row in the project list: tap it
+to open the repo. Set it at the
+bottom of the project's sheet: type `you/project` after `github.com/`, or paste the repo's link.
 
 Every project has an **emoji**, shown next to its name. When you add a project, one is suggested from its name as you
 type ("Garden sensors" → 🌱, "Budget" → 💰); if nothing fits, it's one no other project uses yet. Pick another from
