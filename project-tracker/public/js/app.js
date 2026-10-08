@@ -214,7 +214,7 @@ function offerRestore(item) {
     icon: 'trash',
     action: {
       label: 'Undo',
-      run: () => sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: item.status })
+      run: () => sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: item.status, kind: item.kind })
         .catch(toastError),
     },
   });

@@ -91,9 +91,13 @@
         <button type="button" class="sheet-close" data-close>Close</button>
       </div>
       <form class="sheet-body" id="addForm" autocomplete="off">
-        <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
-          <button type="button" role="radio" data-status="todo">Todo</button>
-          <button type="button" role="radio" data-status="test">Test</button>
+        <div class="add-options">
+          <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
+            <button type="button" role="radio" data-status="todo">Todo</button>
+            <button type="button" role="radio" data-status="test">Test</button>
+          </div>
+          <!-- bug, feature or other (js/tracker/kind-picker.js) -->
+          <div class="kinds" id="addKind" role="radiogroup" aria-label="Kind"></div>
         </div>
         <div class="add-row">
           <input type="text" class="text-input" id="addText" maxlength="300" enterkeyhint="send" spellcheck="true" aria-label="New item">
@@ -120,6 +124,7 @@
           <button type="button" role="radio" data-status="test">Test</button>
           <button type="button" role="radio" data-status="done">Done</button>
         </div>
+        <div class="kinds item-kinds" id="itemKind" role="radiogroup" aria-label="Kind"></div>
         <textarea class="item-note-input" id="itemNote" rows="3" maxlength="2000"
           placeholder="Notes: how to test it, links, anything…" aria-label="Notes"></textarea>
         <p class="item-dates" id="itemDates"></p>

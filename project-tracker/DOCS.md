@@ -40,7 +40,9 @@ Tap the item itself to open it: change its text, add notes (how to test it, a li
 ## Adding things quickly
 
 The round **+** at the bottom right opens a small sheet that adds to **the project you're on**. Pick **Todo** or
-**Test** at the top: it starts on the tab you're looking at (Todo when you're on Done).
+**Test** at the top: it starts on the tab you're looking at (Todo when you're on Done). Next to it, pick what it is:
+🐞 bug, ✨ feature or 📝 other (the last one you picked is kept). Bugs and features show their emoji in the list;
+change it any time from the item, then tap **Save**.
 
 Type and press Enter: it's added, and the field clears for the next one, so you can add several in a row.
 Tap **Close** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.

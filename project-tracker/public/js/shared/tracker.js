@@ -8,7 +8,8 @@
  *   createdAt: number }} Project
  *   emoji: what marks the project (header, project list); hue: its color (item stripe, the + button);
  *   url: its repository (e.g. on GitHub), opened from the header; null when it has none
- * @typedef {{ id: string, projectId: string, text: string, note: string, status: Status,
+ * @typedef {'bug' | 'feature' | 'other'} Kind
+ * @typedef {{ id: string, projectId: string, text: string, note: string, status: Status, kind: Kind,
  *   createdAt: number, movedAt: number }} Item
  *   movedAt: when it got its current status (lists show the latest first)
  */
@@ -29,6 +30,18 @@ export function nextStatus(status) {
   const index = STATUS_IDS.indexOf(status);
   return index >= 0 && index < STATUS_IDS.length - 1 ? STATUS_IDS[index + 1] : null;
 }
+
+/** What an item is, picked with an emoji (compact): a bug, a feature, or anything else. */
+export const KINDS = Object.freeze([
+  { id: 'bug', emoji: '🐞', label: 'Bug' },
+  { id: 'feature', emoji: '✨', label: 'Feature' },
+  { id: 'other', emoji: '📝', label: 'Other' },
+]);
+export const KIND_IDS = Object.freeze(KINDS.map((k) => k.id));
+export const DEFAULT_KIND = 'other';
+
+/** @param {string} kind */
+export const kindOf = (kind) => KINDS.find((k) => k.id === kind) ?? KINDS.find((k) => k.id === DEFAULT_KIND);
 
 export const MAX_NAME = 40;
 export const MAX_URL = 300;

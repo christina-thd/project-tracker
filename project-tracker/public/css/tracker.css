@@ -387,6 +387,42 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .add-send svg.icon { width: 20px; height: 20px; stroke-width: 2.4; }
 .add-send:active { transform: scale(0.94); }
+/* Todo / Test and what it is (bug, feature, other) on one row */
+.add-options { display: flex; align-items: center; gap: 8px; }
+.add-options .segmented { flex: 1; min-width: 0; }
+
+/* bug / feature / other (js/tracker/kind-picker.js): emoji buttons in a pill, the picked one lit */
+.kinds {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 160ms, color 160ms;
+}
+.kind-emoji { font-size: 17px; line-height: 1; opacity: 0.5; transition: opacity 160ms; }
+.kind.selected { background: var(--surface-3); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.kind.selected .kind-emoji { opacity: 1; }
+.item-kinds { align-self: flex-start; }        /* the item sheet: on its own row, as wide as it needs */
+
+/* an item's kind on the board: bugs and features only */
+.item-kind { font-size: 12px; line-height: 1; }
+
 .add-hint { margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
 
 /* ----- sheets' contents ----- */

@@ -1,5 +1,5 @@
 import {
-  cleanUrl, isEmoji, isHue, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
+  cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
   pickPersonEmoji, STATUS_IDS,
 } from '../../public/js/shared/tracker.js';
 import { cleanText, findItem, findPerson, findProject, newId, sameName } from './state.js';
@@ -149,8 +149,8 @@ const handlers = {
     state.items = state.items.filter((i) => i.projectId !== projectId);
   },
 
-  /** Adds an item to a project, to do unless another status is given. `note` is optional. */
-  addItem(state, { projectId, text, note, status }, now) {
+  /** Adds an item to a project, to do unless another status is given. `note` and `kind` (bug, feature…) are optional. */
+  addItem(state, { projectId, text, note, status, kind }, now) {
     getProject(state, projectId);
     if (state.items.length >= MAX_ITEMS) throw new ActionError(`At most ${MAX_ITEMS} items: clear some done ones first`);
     const clean = cleanText(text, MAX_TEXT);
@@ -161,6 +161,7 @@ const handlers = {
       text: clean,
       note: cleanText(note, MAX_NOTE, { multiline: true }),
       status: oneOf(status ?? 'todo', STATUS_IDS, 'status'),
+      kind: oneOf(kind ?? DEFAULT_KIND, KIND_IDS, 'kind'),
       createdAt: now,
       movedAt: now,
     };
@@ -168,13 +169,19 @@ const handlers = {
     return { itemId: item.id };
   },
 
-  /** Changes what an item says, or its note; only the fields given. An item stays in the project it was added to. */
-  editItem(state, { itemId, text, note }) {
+  /**
+   * Changes what an item says, its note or its kind; only the fields given. An item stays in the project it was
+   * added to.
+   */
+  editItem(state, { itemId, text, note, kind }) {
     const item = getItem(state, itemId);
     const clean = text === undefined ? item.text : cleanText(text, MAX_TEXT);
     if (!clean) throw new ActionError('text is required');
+    if (kind !== undefined) oneOf(kind, KIND_IDS, 'kind');
+    // all checked: change it
     item.text = clean;
     if (note !== undefined) item.note = cleanText(note, MAX_NOTE, { multiline: true });
+    if (kind !== undefined) item.kind = kind;
   },
 
   setStatus(state, { itemId, status }, now) {

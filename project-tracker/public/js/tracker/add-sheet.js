@@ -1,9 +1,12 @@
 // Adding items: the round + opens a sheet for the project you're on. Type, press Enter, and it's added; the field
-// clears and stays focused, so several can go in a row. Todo or Test is picked at the top (the tab you're on, at first).
+// clears and stays focused, so several can go in a row. Todo or Test is picked at the top (the tab you're on, at first),
+// and what it is: bug, feature or other (the last one picked, remembered on this device).
 import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
+import { storage } from '../shared/storage.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
+import { createKindPicker } from './kind-picker.js';
 import { toastError } from '../ui/toast.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -21,6 +24,12 @@ export function createAddSheet({ getProjects, onAdded }) {
   let added = 0;                                   // in this opening of the sheet
 
   const sheet = createSheet($('addLayer'), { onClose: () => input.blur() });
+  const kind = createKindPicker($('addKind'), {
+    onPick: (picked) => {
+      storage.set('tracker.kind', picked);
+      input.focus();
+    },
+  });
   const getProject = () => getProjects().find((p) => p.id === projectId);
 
   function render() {
@@ -51,7 +60,7 @@ export function createAddSheet({ getProjects, onAdded }) {
     if (!text || sending || !project) return input.focus();
     sending = true;
     try {
-      await sendAction({ type: 'addItem', projectId: project.id, text, status });
+      await sendAction({ type: 'addItem', projectId: project.id, text, status, kind: kind.value });
       input.value = '';
       added++;
       $('addHint').textContent = `Added ${added}. Type the next one, or tap Close.`;
@@ -71,6 +80,7 @@ export function createAddSheet({ getProjects, onAdded }) {
       if (!getProject()) return;
       status = startStatus === 'test' ? 'test' : 'todo';
       added = 0;
+      kind.set(storage.get('tracker.kind'));
       input.value = '';
       $('addHint').textContent = 'Press Enter to add. It stays open for the next one.';
       render();

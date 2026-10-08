@@ -16,7 +16,7 @@ test('a saved tracker comes back as it was', () => {
     schema: SCHEMA_VERSION,
     people: [{ id: 'ab', name: 'Chris', emoji: '🦊', createdAt: NOW - 20 }],
     projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', createdAt: NOW - 10 }],
-    items: [{ id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', createdAt: NOW - 5, movedAt: NOW - 1 }],
+    items: [{ id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1 }],
   };
   assert.deepEqual(normalizeState(structuredClone(saved), NOW), saved);
 });
@@ -116,6 +116,16 @@ test('a project link is kept when it is a web address, else dropped', () => {
     ],
   }, NOW);
   assert.deepEqual(state.projects.map((p) => p.url), ['https://github.com/me/one', null, null]);
+});
+
+test('items saved before kinds are "other"; unknown kinds too', () => {
+  const state = normalizeState({
+    people: [{ id: 'a1', name: 'Chris' }],
+    projects: [{ id: 'aa', personId: 'a1', name: 'One' }],
+    items: [{ id: 'b1', projectId: 'aa', text: 'Old' }, { id: 'b2', projectId: 'aa', text: 'Odd', kind: 'chore' },
+      { id: 'b3', projectId: 'aa', text: 'Feature', kind: 'feature' }],
+  }, NOW);
+  assert.deepEqual(state.items.map((i) => i.kind), ['other', 'other', 'feature']);
 });
 
 test('the view carries the app version', () => {

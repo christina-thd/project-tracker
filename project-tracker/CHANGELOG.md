@@ -2,6 +2,7 @@
 
 ## 1.1.0
 - Projects can link to their GitHub repo
+- Mark items as 🐞 bug, ✨ feature or 📝 other
 - Messages show at the bottom, and a tap dismisses them
 - Shorter home screen text
 - Clearer emoji field hint

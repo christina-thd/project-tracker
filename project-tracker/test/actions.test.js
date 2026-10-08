@@ -136,7 +136,7 @@ test('items are added to do by default, or as ready to test', () => {
   const { state, projectId } = setup();
   const { itemId } = act(state, { type: 'addItem', projectId, text: '  Fix   the login  ' });
   act(state, { type: 'addItem', projectId, text: 'Dark mode', status: 'test', note: 'Settings → Theme' });
-  assert.deepEqual(state.items[0], { id: itemId, projectId, text: 'Fix the login', note: '', status: 'todo', createdAt: T0, movedAt: T0 });
+  assert.deepEqual(state.items[0], { id: itemId, projectId, text: 'Fix the login', note: '', status: 'todo', kind: 'other', createdAt: T0, movedAt: T0 });
   assert.equal(state.items[1].status, 'test');
   assert.equal(state.items[1].note, 'Settings → Theme');
 });
@@ -270,6 +270,17 @@ test('the GitHub field: you/project or a pasted link, back to you/project for sh
   assert.equal(githubRepo('https://github.com/you/project'), 'you/project');
   assert.equal(githubRepo('https://gitlab.com/you/project'), null);
   assert.equal(githubRepo(null), null);
+});
+
+test('an item is a bug, a feature or other: picked when adding, changed when editing', () => {
+  const { state, projectId } = setup();
+  const { itemId } = act(state, { type: 'addItem', projectId, text: 'Crash on start', kind: 'bug' });
+  assert.equal(state.items[0].kind, 'bug');
+  rejects(state, { type: 'addItem', projectId, text: 'x', kind: 'chore' });
+  act(state, { type: 'editItem', itemId, kind: 'feature' });
+  assert.deepEqual([state.items[0].kind, state.items[0].text], ['feature', 'Crash on start']);   // only the kind
+  rejects(state, { type: 'editItem', itemId, text: 'Changed', kind: 'chore' });
+  assert.equal(state.items[0].text, 'Crash on start');                         // nothing changed
 });
 
 test('the actions are the ones the docs list', () => {

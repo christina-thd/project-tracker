@@ -1,4 +1,4 @@
-// One item: what it says, its notes and its status (its project is shown, not changed here). Changes are kept in the
+// One item: what it says, its notes, its status and kind (its project is shown, not changed here). Changes are kept in the
 // sheet until Save (bottom right) sends them all; Close, swiping down, back or Escape leave without saving.
 // Delete applies right away (after a second tap).
 import { sendAction } from '../shared/api.js';
@@ -7,6 +7,7 @@ import { dateTime } from '../shared/format.js';
 import { statusLabel } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
+import { createKindPicker } from './kind-picker.js';
 import { toast, toastError } from '../ui/toast.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -29,6 +30,7 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
   let status = 'todo';                             // the status picked here (saved with Save)
   let armed = false;
   let saving = false;
+  const kind = createKindPicker($('itemKind'));    // saved with Save, like the rest
 
   const sheet = createSheet($('itemLayer'), {
     onClose: () => {
@@ -74,6 +76,7 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
     const changes = {};
     if (newText !== item.text) changes.text = newText;
     if (note.value.trim() !== item.note) changes.note = note.value.trim();
+    if (kind.value !== item.kind) changes.kind = kind.value;
     saving = true;
     try {
       if (Object.keys(changes).length) await sendAction({ type: 'editItem', itemId: item.id, ...changes });
@@ -129,6 +132,7 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       text.value = item.text;
       note.value = item.note;
       status = item.status;
+      kind.set(item.kind);
       disarm();
       renderStatus();
       render(item);
