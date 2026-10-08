@@ -48,7 +48,7 @@ public/                   browser (plain ES modules, no build step)
                           home screen ↔ a person's projects, wires the parts
   js/shared/              tracker.js (statuses and limits, also used by the server), api, dom, format, storage
   js/ui/                  reusable pieces: back (phone back button), sheet (bottom sheets, swipe to close),
-                          emoji-picker (the emoji grid + "type any emoji" field),
+                          emoji-picker (the emoji grid + a field for any emoji from the keyboard),
                           viewport (keeps sheets above the keyboard), toast (messages at the bottom, with Undo; a tap dismisses), icons
   js/tracker/             home (who's this? a tile per person), person-sheet (new / edit person),
                           board (the three columns), switcher (header project button + the project list),

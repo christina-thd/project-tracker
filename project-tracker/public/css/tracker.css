@@ -452,7 +452,7 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
   background: var(--surface-3);
   font-size: 22px;
 }
-.settings-label { margin: 2px 2px -4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.settings-label { display: block; margin: 2px 2px -4px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .emojis { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 4px; }
 .emoji {
   display: grid;

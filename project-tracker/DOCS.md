@@ -56,7 +56,7 @@ In that list, **⋯** next to a project renames it, changes its emoji or color, 
 
 Every project has an **emoji**, shown next to its name. When you add a project, one is suggested from its name as you
 type ("Garden sensors" → 🌱, "Budget" → 💰); if nothing fits, it's one no other project uses yet. Pick another from
-the grid, or type any emoji in the field below it. The project's **color** marks its items and the + button.
+the grid, or tap the field below it and pick any emoji from your keyboard's emoji keys. The project's **color** marks its items and the + button.
 
 **Clear** in the Done list removes the project's done items; it asks first (tap it again), as this can't be undone.
 
