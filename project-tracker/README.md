@@ -6,10 +6,12 @@ from your phone, and just as usable from a PC.
 ## Features
 
 - Everyone has their own projects: pick yourself on the home screen
-- A project per thing you work on, each with its own emoji
+- A project per thing you work on, each with its own emoji, and a one-tap link to its GitHub repo
 - Three lists: **Todo**, **Test** and **Done**; one tap moves an item to the next
+- Mark items as 🐞 bug, ✨ feature or 📝 other
 - Quick add: tap +, type, press Enter; add several in a row
 - Notes on any item (how to test it, links, …)
+- Deleting a whole project or person asks you to type "delete" first
 - Phones show one list at a time; wide screens show all three side by side
 - Every open screen updates at once
 

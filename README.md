@@ -35,8 +35,9 @@ Keep track of what's to do and what's ready to test, per project.
 
 **Features:**
 - Everyone has their own projects: pick yourself on the home screen
-- A project per thing you work on, each with its own emoji
+- A project per thing you work on, each with its own emoji, and a link to its GitHub repo
 - Todo, Test and Done lists, with notes on any item
+- Mark items as 🐞 bug, ✨ feature or 📝 other
 - Quick add: tap +, type, press Enter, and the next one
 - Live on every screen: phone and PC at the same time
 
