@@ -17,7 +17,7 @@ time it opens straight on your projects.
 
 Your emoji is at the top right: tap it (or use the back button) to go back to the home screen and pick someone else.
 On the home screen, **Add person** adds someone, and **⋯** on a tile renames them, changes their emoji, or deletes them
-(with all their projects).
+(with all their projects: type **delete** to confirm, since it can't be undone).
 
 There are no passwords: anyone can pick anyone. It's for keeping things tidy, not private.
 
@@ -54,7 +54,8 @@ with how many items each has in Todo and Test; tap one to switch to it. With mor
 search field too: type part of a name and press Enter to jump to the first match.
 
 In that list, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
-or deletes it (with everything in it). **New project** at the bottom adds one.
+or deletes it (with everything in it: type **delete** to confirm, since it can't be undone). **New project** at the
+bottom adds one.
 
 A project with a **GitHub repo** shows GitHub's logo next to its name at the top, and on its row in the project list: tap it
 to open the repo. Set it at the

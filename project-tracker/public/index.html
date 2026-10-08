@@ -220,6 +220,24 @@
     </section>
   </div>
 
+  <!-- ===== deleting a project or a person: type "delete" to confirm (js/ui/confirm.js) ===== -->
+  <div class="layer" id="confirmLayer" hidden>
+    <div class="backdrop" data-close></div>
+    <section class="sheet confirm-sheet" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+      <div class="grabber" data-drag data-close></div>
+      <div class="sheet-head" data-drag>
+        <h2 class="sheet-title" id="confirmTitle"></h2>
+        <button type="button" class="sheet-close" data-close>Cancel</button>
+      </div>
+      <form class="sheet-body" id="confirmForm" autocomplete="off">
+        <p class="confirm-text" id="confirmText"></p>
+        <label class="settings-label" for="confirmInput" id="confirmLabel"></label>
+        <input type="text" class="text-input" id="confirmInput" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="delete">
+        <button type="submit" class="pill danger armed" id="confirmGo" disabled></button>
+      </form>
+    </section>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -5,6 +5,7 @@ import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
 import { plural } from '../shared/format.js';
 import { EMOJIS, githubRepo, githubUrl, HUES, pickEmoji, pickHue, shortUrl } from '../shared/tracker.js';
+import { confirmDelete } from '../ui/confirm.js';
 import { createEmojiPicker } from '../ui/emoji-picker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
@@ -29,8 +30,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
   let projectId = null;                            // null: a new project
   let hue = 0;
   let emojiChosen = false;                         // picked by hand: typing the name no longer changes it
-  let armed = false;                               // Delete tapped once: the next tap deletes
-  let clearArmed = false;                          // the same for clearing done items (neither can be undone)
+  let clearArmed = false;                          // Clear tapped once: the next tap clears (it can't be undone)
   let busy = false;
 
   const sheet = createSheet($('projectLayer'), {
@@ -113,8 +113,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     clear.hidden = done === 0;
     clear.classList.toggle('armed', clearArmed);
     clear.innerHTML = `${icon('check')}<span>${clearArmed ? 'Tap again to clear them' : `Clear ${plural(done, 'done item')}`}</span>`;
-    remove.classList.toggle('armed', armed);
-    remove.innerHTML = `${icon('trash')}<span>${armed ? `Tap again: delete it${items.length ? ` and its ${plural(items.length, 'item')}` : ''}` : 'Delete project'}</span>`;
+    remove.innerHTML = `${icon('trash')}<span>Delete project</span>`;
   }
 
   $('projectHues').addEventListener('click', (e) => {
@@ -160,20 +159,23 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       .catch(toastError);
   });
 
-  remove.addEventListener('click', () => {
-    if (!projectId) return;
-    if (!armed) {
-      armed = true;
-      return renderExtra();
-    }
-    const id = projectId;
-    const { name: deleted } = getProjects().find((p) => p.id === id) ?? { name: 'Project' };
+  // A whole project goes, with everything in it, for good: type "delete" to confirm (js/ui/confirm.js).
+  remove.addEventListener('click', async () => {
+    const project = projectId && getProjects().find((p) => p.id === projectId);
+    if (!project) return;
+    const count = itemsOf(project.id).length;
+    const sure = await confirmDelete({
+      title: 'Delete project?',
+      text: `This deletes ${project.name}${count ? ` and its ${plural(count, 'item')}` : ''}, for good. It can't be undone.`,
+      button: 'Delete project',
+    });
+    if (!sure || projectId !== project.id) return;
     projectId = null;                              // nothing to save on close
     sheet.close();
-    sendAction({ type: 'removeProject', projectId: id })
+    sendAction({ type: 'removeProject', projectId: project.id })
       .then(() => {
-        toast(`Deleted ${deleted}`);
-        onDeleted(id);
+        toast(`Deleted ${project.name}`);
+        onDeleted(project.id);
       })
       .catch(toastError);
   });
@@ -183,7 +185,6 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     open(id = null) {
       const project = id ? getProjects().find((p) => p.id === id) : null;
       projectId = project?.id ?? null;
-      armed = false;
       clearArmed = false;
       hue = project?.hue ?? pickHue(getProjects());
       emojiChosen = false;
