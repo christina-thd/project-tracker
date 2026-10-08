@@ -435,7 +435,9 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .item-note-input::placeholder, .text-input::placeholder { color: var(--faint); }
 
 .item-dates { margin: 0; color: var(--faint); font-size: 11px; }
-#itemDelete { align-self: flex-start; }
+/* Delete on the left, Save on the right (js/tracker/item-sheet.js: nothing is saved until Save) */
+.item-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#itemSave { min-width: 110px; }
 
 .project-emoji { flex: none; font-size: 18px; line-height: 1; font-weight: 400; }
 .switch-pick .project-emoji { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-3); font-size: 19px; }

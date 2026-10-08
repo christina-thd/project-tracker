@@ -54,7 +54,7 @@ export function createAddSheet({ getProjects, onAdded }) {
       await sendAction({ type: 'addItem', projectId: project.id, text, status });
       input.value = '';
       added++;
-      $('addHint').textContent = `Added ${added}. Type the next one, or tap Done.`;
+      $('addHint').textContent = `Added ${added}. Type the next one, or tap Close.`;
       onAdded(status);
     } catch (err) {
       toastError(err);

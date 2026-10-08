@@ -34,8 +34,8 @@ Every item is in one of three lists:
 Tap the round button in front of an item to move it to the next list: Todo → Test → Done.
 A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it.
 
-Tap the item itself to open it: change its text, add notes (how to test it, a link, …), move it to any list
-(e.g. back to Todo when a test fails), or delete it.
+Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
+(e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
 
 ## Adding things quickly
 
@@ -43,7 +43,7 @@ The round **+** at the bottom right opens a small sheet that adds to **the proje
 **Test** at the top: it starts on the tab you're looking at (Todo when you're on Done).
 
 Type and press Enter: it's added, and the field clears for the next one, so you can add several in a row.
-Tap **Done** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
+Tap **Close** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
 
 ## Projects
 

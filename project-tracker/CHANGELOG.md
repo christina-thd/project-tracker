@@ -4,6 +4,7 @@
 - Messages show at the bottom, and a tap dismisses them
 - Shorter home screen text
 - Clearer emoji field hint
+- Item changes are saved with a Save button
 - Fix: the app opens on the project you were on last
 - Fix: iPhone + button
 - Fix: tab counts alignment

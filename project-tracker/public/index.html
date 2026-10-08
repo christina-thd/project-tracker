@@ -87,7 +87,7 @@
       <div class="grabber" data-drag data-close></div>
       <div class="sheet-head" data-drag>
         <h2 class="sheet-title" id="addTitle"><span class="project-emoji" id="addEmoji"></span><span id="addProject"></span></h2>
-        <button type="button" class="sheet-close" data-close>Done</button>
+        <button type="button" class="sheet-close" data-close>Close</button>
       </div>
       <form class="sheet-body" id="addForm" autocomplete="off">
         <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
@@ -110,7 +110,7 @@
       <div class="grabber" data-drag data-close></div>
       <div class="sheet-head" data-drag>
         <p class="item-project"><span class="project-emoji" id="itemProjectEmoji"></span><span id="itemProjectName"></span></p>
-        <button type="button" class="sheet-close" data-close>Done</button>
+        <button type="button" class="sheet-close" data-close>Close</button>
       </div>
       <div class="sheet-body">
         <textarea class="item-text-input" id="itemText" rows="1" maxlength="300" aria-label="What"></textarea>
@@ -122,7 +122,10 @@
         <textarea class="item-note-input" id="itemNote" rows="3" maxlength="2000"
           placeholder="Notes: how to test it, links, anything…" aria-label="Notes"></textarea>
         <p class="item-dates" id="itemDates"></p>
-        <button type="button" class="pill danger" id="itemDelete"></button>
+        <div class="item-actions">
+          <button type="button" class="pill danger" id="itemDelete"></button>
+          <button type="button" class="pill primary" id="itemSave"></button>
+        </div>
       </div>
     </section>
   </div>
