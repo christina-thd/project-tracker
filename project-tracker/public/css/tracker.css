@@ -189,7 +189,7 @@ body.offline .offline-badge { display: inline-flex; }
   box-shadow: 0 8px 20px -6px var(--bg);
 }
 .status-tabs > button { min-height: 30px; }
-/* how many are in each list: a small badge, centered on the label (plain smaller text sat high, like a superscript) */
+/* how many are in each list: a small badge, centered on the label */
 .status-tabs .count:not(:empty) {
   min-width: 18px;
   padding: 0 5px;

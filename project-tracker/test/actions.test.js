@@ -87,7 +87,7 @@ test('projects get the next unused color, or the one given', () => {
 test('a new project gets the emoji its name suggests, else one not used yet, or the one given', () => {
   const state = withPerson();
   act(state, { type: 'addProject', name: 'Garden sensors' });
-  act(state, { type: 'addProject', name: 'Munchkin Counter' });
+  act(state, { type: 'addProject', name: 'Card tricks' });
   act(state, { type: 'addProject', name: 'Zzz' });
   act(state, { type: 'addProject', name: 'Mine', emoji: '🦄' });
   assert.deepEqual(state.projects.map((p) => p.emoji), ['🌱', '🎲', EMOJIS[0], '🦄']);

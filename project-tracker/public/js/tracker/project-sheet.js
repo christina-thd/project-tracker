@@ -190,7 +190,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       emojiChosen = false;
       showEmoji(project?.emoji ?? pickEmoji(getProjects()));
       name.value = project?.name ?? '';
-      // a GitHub repo as you/project; a link elsewhere (saved by an older version) as it is, without https://
+      // a GitHub repo as you/project; any other link (set through the API) as it is, without https://
       urlShown = project?.url ? githubRepo(project.url) ?? shortUrl(project.url) : '';
       url.value = urlShown;
       renderOpen();

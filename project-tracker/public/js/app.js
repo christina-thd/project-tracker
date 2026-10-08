@@ -285,8 +285,7 @@ subscribe((view) => {
   allProjects = view.projects;
   items = view.items;
   loaded = true;
-  // starting: the project this device was on, read before keepChoicesValid() (which would otherwise see none yet,
-  // fall back to the first project and save that over it)
+  // the project this device was on: read before keepChoicesValid(), which would otherwise save the first one over it
   if (first && person) current = storage.get(projectKey());
   keepChoicesValid();
   if (first) {

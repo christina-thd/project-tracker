@@ -141,8 +141,8 @@ const words = (...list) => new RegExp(`\\b(?:${list.join('|')})(?:s|es|ing|ed)?\
 const SUGGESTIONS = [
   [words('recipe', 'food', 'cook', 'kitchen', 'meal'), '🍳'],   // before books: "Recipe book" is about food
   [words('game', 'gaming', 'play', 'steam', 'nintendo', 'xbox', 'playstation'), '🎮'],
-  [words('book', 'library', 'libraries', 'read', 'reading', 'manga', 'comic', 'hoard'), '📚'],
-  [words('card', 'dice', 'board ?game', 'munchkin'), '🎲'],
+  [words('book', 'library', 'libraries', 'read', 'reading', 'manga', 'comic'), '📚'],
+  [words('card', 'dice', 'board ?game'), '🎲'],
   [words('home', 'house', 'dashboard', 'assistant'), '🏠'],
   [words('garden', 'plant', 'sensor', 'grow'), '🌱'],
   [words('budget', 'money', 'finance', 'bank', 'invoice', 'pay', 'expense'), '💰'],
@@ -180,6 +180,7 @@ export function isEmoji(value) {
   if (typeof value !== 'string' || !value || value.length > 16 || /\s/.test(value)) return false;
   return [...segmenter.segment(value)].length === 1 && EMOJI.test(value);
 }
+
 /** The first emoji in some text (what was typed or pasted), or ''. */
 export function firstEmoji(text) {
   for (const { segment } of segmenter.segment(String(text ?? ''))) if (isEmoji(segment)) return segment;
