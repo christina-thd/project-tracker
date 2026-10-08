@@ -1,6 +1,6 @@
 name: "Project Tracker"
 description: "What's still to do and what's ready to test, for every project you're working on"
-version: "1.0.0"
+version: "1.1.0"
 slug: "project_tracker"
 init: false
 arch:

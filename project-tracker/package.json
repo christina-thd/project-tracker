@@ -1,6 +1,6 @@
 {
   "name": "project-tracker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "To-do and ready-to-test tracker for every project you're working on, packaged as a Home Assistant add-on",
   "private": true,
   "type": "module",
