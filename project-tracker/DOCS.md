@@ -32,7 +32,7 @@ Every item is in one of three lists:
 | **Done**          | Tested and finished                      |
 
 Tap the round button in front of an item to move it to the next list: Todo → Test → Done.
-A message at the top offers **Undo** for a few seconds.
+A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it.
 
 Tap the item itself to open it: change its text, add notes (how to test it, a link, …), move it to any list
 (e.g. back to Todo when a test fails), or delete it.

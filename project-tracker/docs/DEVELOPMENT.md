@@ -49,7 +49,7 @@ public/                   browser (plain ES modules, no build step)
   js/shared/              tracker.js (statuses and limits, also used by the server), api, dom, format, storage
   js/ui/                  reusable pieces: back (phone back button), sheet (bottom sheets, swipe to close),
                           emoji-picker (the emoji grid + "type any emoji" field),
-                          viewport (keeps sheets above the keyboard), toast (with Undo), icons
+                          viewport (keeps sheets above the keyboard), toast (messages at the bottom, with Undo; a tap dismisses), icons
   js/tracker/             home (who's this? a tile per person), person-sheet (new / edit person),
                           board (the three columns), switcher (header project button + the project list),
                           add-sheet (the + button's sheet), item-sheet (one item), project-sheet (new / edit project)
