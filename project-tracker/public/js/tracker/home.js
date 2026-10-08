@@ -13,9 +13,9 @@ import { icon } from '../ui/icons.js';
  *   current: who this device last picked (marked on their tile)
  */
 export function renderHome({ people, projects, items, current }) {
-  $('homeTagline').textContent = people.length
-    ? 'Pick yourself to see your projects.'
-    : 'Add the people who use this, then pick yourself. Everyone has their own projects.';
+  // a line under "Who's this?" only on a first run; after that the question says it all
+  $('homeTagline').textContent = people.length ? '' : 'Add yourself, then go get stuff done.';
+  $('homeTagline').hidden = people.length > 0;
   $('people').innerHTML = people.map((person) => {
     const theirs = new Set(projects.filter((p) => p.personId === person.id).map((p) => p.id));
     const open = items.filter((i) => theirs.has(i.projectId) && i.status !== 'done').length;

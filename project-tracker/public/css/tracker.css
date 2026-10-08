@@ -44,6 +44,7 @@ body.offline .offline-badge { display: inline-flex; }
 }
 .home-view h1 { margin: 10px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
 .home-tagline { max-width: 320px; margin: 0 0 18px; color: var(--muted); }
+.home-tagline[hidden] + .people { margin-top: 22px; }   /* no line under the question: the tiles keep their distance */
 .people {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -173,7 +174,17 @@ body.offline .offline-badge { display: inline-flex; }
   box-shadow: 0 8px 20px -6px var(--bg);
 }
 .status-tabs > button { min-height: 30px; }
-.status-tabs .count:not(:empty) { font-size: 11px; opacity: 0.75; }
+/* how many are in each list: a small badge, centered on the label (plain smaller text sat high, like a superscript) */
+.status-tabs .count:not(:empty) {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+}
+.status-tabs .selected .count:not(:empty) { background: rgb(0 0 0 / 0.14); }
 
 .board { margin-top: 14px; }
 .column { display: none; }
