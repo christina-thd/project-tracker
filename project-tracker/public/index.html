@@ -34,6 +34,7 @@
       <header class="top">
         <!-- the project you're on: tap to switch (js/tracker/switcher.js) -->
         <h1 class="project-title"><span id="appName">Projects</span><button type="button" class="project-button" id="projectButton" aria-haspopup="dialog" hidden></button></h1>
+        <a class="repo-link" id="repoLink" target="_blank" rel="noopener noreferrer" hidden></a>
         <span class="offline-badge" id="offline" title="Not connected to Home Assistant: changes from other screens show up once it's back"></span>
         <p class="top-summary" id="summary"></p>
         <!-- whose projects these are: tap to go back to the home screen and switch person -->
@@ -87,12 +88,16 @@
       <div class="grabber" data-drag data-close></div>
       <div class="sheet-head" data-drag>
         <h2 class="sheet-title" id="addTitle"><span class="project-emoji" id="addEmoji"></span><span id="addProject"></span></h2>
-        <button type="button" class="sheet-close" data-close>Done</button>
+        <button type="button" class="sheet-close" data-close>Close</button>
       </div>
       <form class="sheet-body" id="addForm" autocomplete="off">
-        <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
-          <button type="button" role="radio" data-status="todo">Todo</button>
-          <button type="button" role="radio" data-status="test">Test</button>
+        <div class="add-options">
+          <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
+            <button type="button" role="radio" data-status="todo">Todo</button>
+            <button type="button" role="radio" data-status="test">Test</button>
+          </div>
+          <!-- bug, feature or other (js/tracker/kind-picker.js) -->
+          <div class="kinds" id="addKind" role="radiogroup" aria-label="Kind"></div>
         </div>
         <div class="add-row">
           <input type="text" class="text-input" id="addText" maxlength="300" enterkeyhint="send" spellcheck="true" aria-label="New item">
@@ -110,7 +115,7 @@
       <div class="grabber" data-drag data-close></div>
       <div class="sheet-head" data-drag>
         <p class="item-project"><span class="project-emoji" id="itemProjectEmoji"></span><span id="itemProjectName"></span></p>
-        <button type="button" class="sheet-close" data-close>Done</button>
+        <button type="button" class="sheet-close" data-close>Close</button>
       </div>
       <div class="sheet-body">
         <textarea class="item-text-input" id="itemText" rows="1" maxlength="300" aria-label="What"></textarea>
@@ -119,10 +124,14 @@
           <button type="button" role="radio" data-status="test">Test</button>
           <button type="button" role="radio" data-status="done">Done</button>
         </div>
+        <div class="kinds item-kinds" id="itemKind" role="radiogroup" aria-label="Kind"></div>
         <textarea class="item-note-input" id="itemNote" rows="3" maxlength="2000"
           placeholder="Notes: how to test it, links, anything…" aria-label="Notes"></textarea>
         <p class="item-dates" id="itemDates"></p>
-        <button type="button" class="pill danger" id="itemDelete"></button>
+        <div class="item-actions">
+          <button type="button" class="pill danger" id="itemDelete"></button>
+          <button type="button" class="pill primary" id="itemSave"></button>
+        </div>
       </div>
     </section>
   </div>
@@ -162,8 +171,9 @@
         </div>
         <p class="settings-label">Emoji</p>
         <div class="emojis" id="personEmojis" role="radiogroup" aria-label="Emoji"></div>
+        <label class="settings-label" for="personEmojiCustom">Not in the list?</label>
         <input type="text" class="text-input emoji-custom" id="personEmojiCustom" maxlength="16" autocomplete="off"
-          placeholder="Or type any emoji" aria-label="Any other emoji">
+          placeholder="Use your emoji keyboard 😀">
         <button type="submit" class="pill primary" id="personSave"></button>
         <div class="project-extra" id="personExtra">
           <button type="button" class="pill danger" id="personDelete"></button>
@@ -186,17 +196,44 @@
           <span class="emoji-current" id="projectEmoji" aria-hidden="true"></span>
           <input type="text" class="text-input" id="projectName" maxlength="40" enterkeyhint="done" placeholder="Project name" aria-label="Project name">
         </div>
+
         <p class="settings-label">Emoji</p>
         <div class="emojis" id="projectEmojis" role="radiogroup" aria-label="Emoji"></div>
+        <label class="settings-label" for="projectEmojiCustom">Not in the list?</label>
         <input type="text" class="text-input emoji-custom" id="projectEmojiCustom" maxlength="16" autocomplete="off"
-          placeholder="Or type any emoji" aria-label="Any other emoji">
+          placeholder="Use your emoji keyboard 😀">
         <p class="settings-label">Color</p>
         <div class="hues" id="projectHues" role="radiogroup" aria-label="Color"></div>
+        <label class="settings-label" for="projectUrl">GitHub repo (optional)</label>
+        <div class="repo-field">
+          <span class="repo-prefix" aria-hidden="true">github.com/</span>
+          <input type="text" id="projectUrl" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false"
+            enterkeyhint="done" placeholder="you/project">
+          <a class="repo-open" id="projectUrlOpen" target="_blank" rel="noopener noreferrer" hidden>Open</a>
+        </div>
         <button type="submit" class="pill primary" id="projectSave"></button>
         <div class="project-extra" id="projectExtra">
           <button type="button" class="pill ghost" id="projectClear"></button>
           <button type="button" class="pill danger" id="projectDelete"></button>
         </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- ===== deleting a project or a person: type "delete" to confirm (js/ui/confirm.js) ===== -->
+  <div class="layer" id="confirmLayer" hidden>
+    <div class="backdrop" data-close></div>
+    <section class="sheet confirm-sheet" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+      <div class="grabber" data-drag data-close></div>
+      <div class="sheet-head" data-drag>
+        <h2 class="sheet-title" id="confirmTitle"></h2>
+        <button type="button" class="sheet-close" data-close>Cancel</button>
+      </div>
+      <form class="sheet-body" id="confirmForm" autocomplete="off">
+        <p class="confirm-text" id="confirmText"></p>
+        <label class="settings-label" for="confirmInput" id="confirmLabel"></label>
+        <input type="text" class="text-input" id="confirmInput" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="delete">
+        <button type="submit" class="pill danger armed" id="confirmGo" disabled></button>
       </form>
     </section>
   </div>

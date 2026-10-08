@@ -1,6 +1,7 @@
 // Switching project: the project's name in the header opens a sheet listing every project, most recently active
 // first, with how many items each has in Todo and Test. A search field shows once there are more than a few.
 import { $, closest, escapeHtml } from '../shared/dom.js';
+import { githubRepo, shortUrl } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 
@@ -40,12 +41,18 @@ export function createSwitcher({ getProjects, getItems, getCurrent, onPick, onEd
         ? `${todo ? `<span class="count-todo">${todo} todo</span>` : ''}${test ? `<span class="count-test">${test} test</span>` : ''}`
         : '<span>Nothing open</span>';
       const selected = p.id === current;
+      // its repo, one tap away (a link: it opens in a new tab, the list stays)
+      const repo = p.url
+        ? `<a class="switch-repo" href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer"
+            aria-label="Open the repo of ${escapeHtml(p.name)}" title="${escapeHtml(shortUrl(p.url))}">${icon(githubRepo(p.url) ? 'github' : 'code')}</a>`
+        : '';
       return `<div class="switch-row${selected ? ' selected' : ''}" role="listitem">
         <button type="button" class="switch-pick" data-pick="${p.id}" aria-current="${selected}">
           <span class="project-emoji">${escapeHtml(p.emoji)}</span>
           <span class="switch-text"><span class="switch-name">${escapeHtml(p.name)}</span><span class="switch-counts">${counts}</span></span>
           ${selected ? '<span class="switch-current">Current</span>' : ''}
         </button>
+        ${repo}
         <button type="button" class="switch-edit" data-edit="${p.id}" aria-label="Edit ${escapeHtml(p.name)}">${icon('dots')}</button>
       </div>`;
     }).join('') || '<p class="switch-empty">No project matches.</p>';
@@ -90,11 +97,22 @@ export function createSwitcher({ getProjects, getItems, getCurrent, onPick, onEd
   };
 }
 
-/** The header button: the project you're on, with its color (just "Projects" before there's one). */
+/**
+ * The header: the project you're on (just "Projects" before there's one), and a link to its repo when it has one
+ * (GitHub's mark for a GitHub repo, </> for anywhere else).
+ */
 export function renderProjectButton(project) {
   const button = $('projectButton');
   button.hidden = !project;
   $('appName').hidden = Boolean(project);
+  const repo = /** @type {HTMLAnchorElement} */ ($('repoLink'));
+  repo.hidden = !project?.url;
+  if (project?.url && repo.href !== project.url) {
+    repo.href = project.url;
+    repo.innerHTML = icon(githubRepo(project.url) ? 'github' : 'code');
+    repo.title = `Open ${shortUrl(project.url)}`;
+    repo.setAttribute('aria-label', `Open the repo, ${shortUrl(project.url)}`);
+  }
   if (!project) return;
   button.innerHTML = `<span class="project-emoji">${escapeHtml(project.emoji)}</span><span class="project-button-name">${escapeHtml(project.name)}</span>${icon('chevron')}`;
   button.setAttribute('aria-label', `${project.name}: switch project`);

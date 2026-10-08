@@ -2,7 +2,7 @@
 // wide screens show all three side by side (css/tracker.css).
 import { $, closest, escapeHtml } from '../shared/dom.js';
 import { ago, plural } from '../shared/format.js';
-import { nextStatus, STATUS_IDS } from '../shared/tracker.js';
+import { DEFAULT_KIND, kindOf, nextStatus, STATUS_IDS } from '../shared/tracker.js';
 import { icon, STATUS_ICONS } from '../ui/icons.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -31,8 +31,10 @@ function itemHtml(item, hue, now) {
     ? `<button type="button" class="advance" data-advance="${item.id}" aria-label="${ADVANCE_LABEL[item.status]}">${icon(STATUS_ICONS[item.status])}</button>`
     : `<span class="advance done" aria-hidden="true">${icon(STATUS_ICONS.done)}</span>`;
   const note = item.note ? `<span class="has-note" title="Has notes">${icon('note')}</span>` : '';
+  // bugs and features show their emoji; "other" shows nothing, to keep the list calm
+  const kind = item.kind !== DEFAULT_KIND ? `<span class="item-kind" title="${kindOf(item.kind).label}">${kindOf(item.kind).emoji}</span>` : '';
   return `<li class="item${arrived ? ' arrived' : ''}" data-item="${item.id}" style="--hue: ${hue}">${button}
-    <div class="item-body"><p class="item-text">${escapeHtml(item.text)}</p><div class="item-meta">${note}<time>${ago(item.movedAt, now)}</time></div></div></li>`;
+    <div class="item-body"><p class="item-text">${escapeHtml(item.text)}</p><div class="item-meta">${kind}${note}<time>${ago(item.movedAt, now)}</time></div></div></li>`;
 }
 
 /**

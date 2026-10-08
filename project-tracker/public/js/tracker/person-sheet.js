@@ -3,6 +3,7 @@ import { sendAction } from '../shared/api.js';
 import { $ } from '../shared/dom.js';
 import { plural } from '../shared/format.js';
 import { PERSON_EMOJIS, pickPersonEmoji } from '../shared/tracker.js';
+import { confirmDelete } from '../ui/confirm.js';
 import { createEmojiPicker } from '../ui/emoji-picker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
@@ -22,7 +23,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
   const custom = /** @type {HTMLInputElement} */ ($('personEmojiCustom'));
   const remove = $('personDelete');
   let personId = null;                             // null: someone new
-  let armed = false;                               // Delete tapped once: the next tap deletes
+
   let busy = false;
 
   const sheet = createSheet($('personLayer'), {
@@ -54,12 +55,8 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
   }
 
   function renderDelete() {
-    const projects = personId ? getProjects().filter((p) => p.personId === personId).length : 0;
     $('personExtra').hidden = !personId;
-    remove.classList.toggle('armed', armed);
-    remove.innerHTML = `${icon('trash')}<span>${armed
-      ? `Tap again: delete them${projects ? ` and their ${plural(projects, 'project')}` : ''}`
-      : 'Delete person'}</span>`;
+    remove.innerHTML = `${icon('trash')}<span>Delete person</span>`;
   }
 
   $('personForm').addEventListener('submit', async (e) => {
@@ -82,20 +79,23 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     }
   });
 
-  remove.addEventListener('click', () => {
-    if (!personId) return;
-    if (!armed) {
-      armed = true;
-      return renderDelete();
-    }
-    const id = personId;
-    const { name: deleted } = getPeople().find((p) => p.id === id) ?? { name: 'them' };
+  // Someone goes with all their projects, for good: type "delete" to confirm (js/ui/confirm.js).
+  remove.addEventListener('click', async () => {
+    const person = personId && getPeople().find((p) => p.id === personId);
+    if (!person) return;
+    const projects = getProjects().filter((p) => p.personId === person.id).length;
+    const sure = await confirmDelete({
+      title: 'Delete person?',
+      text: `This deletes ${person.name}${projects ? `, their ${plural(projects, 'project')} and everything in them` : ''}, for good. It can't be undone.`,
+      button: 'Delete person',
+    });
+    if (!sure || personId !== person.id) return;
     personId = null;                               // nothing to save on close
     sheet.close();
-    sendAction({ type: 'removePerson', personId: id })
+    sendAction({ type: 'removePerson', personId: person.id })
       .then(() => {
-        toast(`Deleted ${deleted}`);
-        onDeleted(id);
+        toast(`Deleted ${person.name}`);
+        onDeleted(person.id);
       })
       .catch(toastError);
   });
@@ -105,7 +105,6 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     open(id = null) {
       const person = id ? getPeople().find((p) => p.id === id) : null;
       personId = person?.id ?? null;
-      armed = false;
       const value = person?.emoji ?? pickPersonEmoji(getPeople());
       emoji.set(value);
       $('personEmoji').textContent = value;

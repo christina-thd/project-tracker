@@ -1,11 +1,13 @@
-// One item: what it says, its notes and its status (its project is shown, not changed here). Text and notes are saved
-// when the sheet closes (or the field loses focus); status and delete apply right away.
+// One item: what it says, its notes, its status and kind (its project is shown, not changed here). Changes are kept in the
+// sheet until Save (bottom right) sends them all; Close, swiping down, back or Escape leave without saving.
+// Delete applies right away (after a second tap).
 import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
 import { dateTime } from '../shared/format.js';
 import { statusLabel } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
+import { createKindPicker } from './kind-picker.js';
 import { toast, toastError } from '../ui/toast.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -25,24 +27,18 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
   const note = /** @type {HTMLTextAreaElement} */ ($('itemNote'));
   const remove = $('itemDelete');
   let itemId = null;
+  let status = 'todo';                             // the status picked here (saved with Save)
   let armed = false;
+  let saving = false;
+  const kind = createKindPicker($('itemKind'));    // saved with Save, like the rest
 
-  const sheet = createSheet($('itemLayer'), { onClose: () => { save(); itemId = null; } });
-
-  let sent = { text: '', note: '' };               // what the server has (or was last sent), to send only changes
-
-  /** Sends what changed in the text fields. */
-  function save() {
-    if (!itemId || !getItem(itemId)) return;
-    const changes = {};
-    const newText = text.value.replace(/\s+/g, ' ').trim();
-    const newNote = note.value.trim();
-    if (newText && newText !== sent.text) changes.text = newText;
-    if (newNote !== sent.note) changes.note = newNote;
-    if (!Object.keys(changes).length) return;
-    sent = { ...sent, ...changes };
-    sendAction({ type: 'editItem', itemId, ...changes }).catch(toastError);
-  }
+  const sheet = createSheet($('itemLayer'), {
+    onClose: () => {
+      text.blur();
+      note.blur();
+      itemId = null;                               // not saved: what was changed is dropped
+    },
+  });
 
   function disarm() {
     armed = false;
@@ -50,13 +46,16 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
     remove.innerHTML = `${icon('trash')}<span>Delete</span>`;
   }
 
-  /** Shows the item's current status and project (it may have changed on another screen). */
-  function render(item) {
+  function renderStatus() {
     for (const button of $('itemStatus').querySelectorAll('[data-status]')) {
-      const selected = button instanceof HTMLElement && button.dataset.status === item.status;
+      const selected = button instanceof HTMLElement && button.dataset.status === status;
       button.classList.toggle('selected', selected);
       button.setAttribute('aria-checked', String(selected));
     }
+  }
+
+  /** The item's project and dates (they can change on another screen; what's being edited here doesn't). */
+  function render(item) {
     const project = getProjects().find((p) => p.id === item.projectId);
     $('itemProjectEmoji').textContent = project?.emoji ?? '';
     $('itemProjectName').textContent = project?.name ?? '';
@@ -65,17 +64,43 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       : `Added ${dateTime(item.createdAt)} · ${statusLabel(item.status)} since ${dateTime(item.movedAt)}`;
   }
 
+  /** Sends what was changed (text, notes, status), then closes. Nothing changed: just closes. */
+  async function save() {
+    const item = itemId && getItem(itemId);
+    if (!item || saving) return;
+    const newText = text.value.replace(/\s+/g, ' ').trim();
+    if (!newText) {
+      toast('An item needs some text', { error: true });
+      return text.focus();
+    }
+    const changes = {};
+    if (newText !== item.text) changes.text = newText;
+    if (note.value.trim() !== item.note) changes.note = note.value.trim();
+    if (kind.value !== item.kind) changes.kind = kind.value;
+    saving = true;
+    try {
+      if (Object.keys(changes).length) await sendAction({ type: 'editItem', itemId: item.id, ...changes });
+      if (status !== item.status) await sendAction({ type: 'setStatus', itemId: item.id, status });
+      sheet.close();
+    } catch (err) {
+      toastError(err);
+    } finally {
+      saving = false;
+    }
+  }
+
   $('itemStatus').addEventListener('click', (e) => {
     const button = closest(e, '[data-status]');
     if (!button || !itemId) return;
-    sendAction({ type: 'setStatus', itemId, status: button.dataset.status }).catch(toastError);
+    status = button.dataset.status;
+    renderStatus();
   });
+
+  $('itemSave').addEventListener('click', save);
 
   text.addEventListener('input', () => fit(text));
   note.addEventListener('input', () => fit(note));
-  text.addEventListener('blur', save);
-  note.addEventListener('blur', save);
-  // Enter in the title finishes it (it's one line, however long); Shift+Enter is not needed there
+  // Enter in the title finishes it (it's one line, however long)
   text.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -92,7 +117,6 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       remove.innerHTML = `${icon('trash')}<span>Tap again to delete</span>`;
       return;
     }
-    itemId = null;                                 // nothing left to save on close
     sheet.close();
     sendAction({ type: 'removeItem', itemId: item.id })
       .then(() => onDeleted(item))
@@ -107,9 +131,12 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       itemId = id;
       text.value = item.text;
       note.value = item.note;
-      sent = { text: item.text, note: item.note };
+      status = item.status;
+      kind.set(item.kind);
       disarm();
+      renderStatus();
       render(item);
+      $('itemSave').innerHTML = `${icon('check')}<span>Save</span>`;
       sheet.open();
       requestAnimationFrame(() => {
         fit(text);
@@ -117,7 +144,7 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       });
     },
 
-    /** After a change: shows the latest, or closes if the item was deleted (e.g. on another screen). */
+    /** After a change: the latest project name and dates, or closes if the item was deleted (e.g. on another screen). */
     refresh() {
       if (!itemId || !sheet.isOpen) return;
       const item = getItem(itemId);

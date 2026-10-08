@@ -17,7 +17,7 @@ time it opens straight on your projects.
 
 Your emoji is at the top right: tap it (or use the back button) to go back to the home screen and pick someone else.
 On the home screen, **Add person** adds someone, and **⋯** on a tile renames them, changes their emoji, or deletes them
-(with all their projects).
+(with all their projects: type **delete** to confirm, since it can't be undone).
 
 There are no passwords: anyone can pick anyone. It's for keeping things tidy, not private.
 
@@ -32,18 +32,20 @@ Every item is in one of three lists:
 | **Done**          | Tested and finished                      |
 
 Tap the round button in front of an item to move it to the next list: Todo → Test → Done.
-A message at the top offers **Undo** for a few seconds.
+A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it.
 
-Tap the item itself to open it: change its text, add notes (how to test it, a link, …), move it to any list
-(e.g. back to Todo when a test fails), or delete it.
+Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
+(e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
 
 ## Adding things quickly
 
 The round **+** at the bottom right opens a small sheet that adds to **the project you're on**. Pick **Todo** or
-**Test** at the top: it starts on the tab you're looking at (Todo when you're on Done).
+**Test** at the top: it starts on the tab you're looking at (Todo when you're on Done). Next to it, pick what it is:
+🐞 bug, ✨ feature or 📝 other (the last one you picked is kept). Bugs and features show their emoji in the list;
+change it any time from the item, then tap **Save**.
 
 Type and press Enter: it's added, and the field clears for the next one, so you can add several in a row.
-Tap **Done** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
+Tap **Close** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
 
 ## Projects
 
@@ -51,12 +53,17 @@ The name at the top is the project you're on. Tap it to see all your projects (j
 with how many items each has in Todo and Test; tap one to switch to it. With more than a few projects there's a
 search field too: type part of a name and press Enter to jump to the first match.
 
-In that list, **⋯** next to a project renames it, changes its emoji or color, clears its done items, or deletes it
-(with everything in it). **New project** at the bottom adds one.
+In that list, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
+or deletes it (with everything in it: type **delete** to confirm, since it can't be undone). **New project** at the
+bottom adds one.
+
+A project with a **GitHub repo** shows GitHub's logo next to its name at the top, and on its row in the project list: tap it
+to open the repo. Set it at the
+bottom of the project's sheet: type `you/project` after `github.com/`, or paste the repo's link.
 
 Every project has an **emoji**, shown next to its name. When you add a project, one is suggested from its name as you
 type ("Garden sensors" → 🌱, "Budget" → 💰); if nothing fits, it's one no other project uses yet. Pick another from
-the grid, or type any emoji in the field below it. The project's **color** marks its items and the + button.
+the grid, or tap the field below it and pick any emoji from your keyboard's emoji keys. The project's **color** marks its items and the + button.
 
 **Clear** in the Done list removes the project's done items; it asks first (tap it again), as this can't be undone.
 

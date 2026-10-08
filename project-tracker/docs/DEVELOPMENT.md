@@ -48,9 +48,10 @@ public/                   browser (plain ES modules, no build step)
                           home screen ↔ a person's projects, wires the parts
   js/shared/              tracker.js (statuses and limits, also used by the server), api, dom, format, storage
   js/ui/                  reusable pieces: back (phone back button), sheet (bottom sheets, swipe to close),
-                          emoji-picker (the emoji grid + "type any emoji" field),
-                          viewport (keeps sheets above the keyboard), toast (with Undo), icons
-  js/tracker/             home (who's this? a tile per person), person-sheet (new / edit person),
+                          emoji-picker (the emoji grid + a field for any emoji from the keyboard),
+                          confirm (type "delete" before deleting a project or a person),
+                          viewport (keeps sheets above the keyboard), toast (messages at the bottom, with Undo; a tap dismisses), icons
+  js/tracker/             kind-picker (bug / feature / other, by emoji), home (who's this? a tile per person), person-sheet (new / edit person),
                           board (the three columns), switcher (header project button + the project list),
                           add-sheet (the + button's sheet), item-sheet (one item), project-sheet (new / edit project)
 
@@ -65,7 +66,8 @@ to every screen over `GET /api/events` (Server-Sent Events). Screens never chang
 only render the latest view.
 
 **Actions:** `addPerson`, `renamePerson`, `setPersonEmoji`, `removePerson` (with their projects), `addProject`
-(for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `removeProject` (with its items), `addItem`,
+(for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `setProjectUrl` (its repo link: any web address, `cleanUrl`; the
+project sheet takes a GitHub repo, `githubUrl` / `githubRepo` in `public/js/shared/tracker.js`), `removeProject` (with its items), `addItem`,
 `editItem`, `setStatus`, `removeItem`, `clearDone`. See `src/tracker/actions.js`. Statuses are `todo`, `test` and
 `done` (`STATUSES` in `public/js/shared/tracker.js`); `movedAt` records when an item got its status, and lists show
 the latest first.

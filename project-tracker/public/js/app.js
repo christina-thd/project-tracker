@@ -214,7 +214,7 @@ function offerRestore(item) {
     icon: 'trash',
     action: {
       label: 'Undo',
-      run: () => sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: item.status })
+      run: () => sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: item.status, kind: item.kind })
         .catch(toastError),
     },
   });
@@ -285,12 +285,12 @@ subscribe((view) => {
   allProjects = view.projects;
   items = view.items;
   loaded = true;
+  // the project this device was on: read before keepChoicesValid(), which would otherwise save the first one over it
+  if (first && person) current = storage.get(projectKey());
   keepChoicesValid();
   if (first) {
     // this device's person, straight away; nobody picked yet: the home screen
     onHome = !getPerson();
-    if (!onHome) current = storage.get(projectKey());
-    keepChoicesValid();
     showView();
   } else {
     render();

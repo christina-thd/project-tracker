@@ -44,6 +44,7 @@ body.offline .offline-badge { display: inline-flex; }
 }
 .home-view h1 { margin: 10px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
 .home-tagline { max-width: 320px; margin: 0 0 18px; color: var(--muted); }
+.home-tagline[hidden] + .people { margin-top: 22px; }   /* no line under the question: the tiles keep their distance */
 .people {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -118,6 +119,21 @@ body.offline .offline-badge { display: inline-flex; }
 .project-button .project-emoji { font-size: 19px; }
 .project-button-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-button svg.icon { width: 16px; height: 16px; color: var(--muted); stroke-width: 2.2; }
+
+/* the project's repo (when it has a link): </> next to its name, opens it in a new tab */
+.repo-link {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.repo-link svg.icon { width: 16px; height: 16px; stroke-width: 2.2; }
+.repo-link:active { background: var(--surface-3); color: var(--ink); }
+@media (hover: hover) { .repo-link:hover { color: var(--ink); border-color: var(--faint); } }
 @media (hover: hover) { .project-button:hover { background: var(--surface-2); } }
 
 /* ----- project list ----- */
@@ -173,7 +189,17 @@ body.offline .offline-badge { display: inline-flex; }
   box-shadow: 0 8px 20px -6px var(--bg);
 }
 .status-tabs > button { min-height: 30px; }
-.status-tabs .count:not(:empty) { font-size: 11px; opacity: 0.75; }
+/* how many are in each list: a small badge, centered on the label */
+.status-tabs .count:not(:empty) {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+}
+.status-tabs .selected .count:not(:empty) { background: rgb(0 0 0 / 0.14); }
 
 .board { margin-top: 14px; }
 .column { display: none; }
@@ -326,7 +352,9 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .fab {
   position: fixed;
   right: max(16px, calc((100% - 1240px) / 2 + 16px));
-  bottom: calc(18px + var(--safe-bottom));
+  /* from the part of the screen you can see (js/ui/viewport.js), not the page's bottom: iPhone home-screen apps
+     report the page a little short at first, which would leave it too high until the first scroll */
+  top: calc(var(--viewport-top) + var(--viewport-height) - 54px - 18px - var(--safe-bottom));
   z-index: 10;
   display: grid;
   place-items: center;
@@ -359,6 +387,42 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .add-send svg.icon { width: 20px; height: 20px; stroke-width: 2.4; }
 .add-send:active { transform: scale(0.94); }
+/* Todo / Test and what it is (bug, feature, other) on one row */
+.add-options { display: flex; align-items: center; gap: 8px; }
+.add-options .segmented { flex: 1; min-width: 0; }
+
+/* bug / feature / other (js/tracker/kind-picker.js): emoji buttons in a pill, the picked one lit */
+.kinds {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 160ms, color 160ms;
+}
+.kind-emoji { font-size: 17px; line-height: 1; opacity: 0.5; transition: opacity 160ms; }
+.kind.selected { background: var(--surface-3); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.kind.selected .kind-emoji { opacity: 1; }
+.item-kinds { align-self: flex-start; }        /* the item sheet: on its own row, as wide as it needs */
+
+/* an item's kind on the board: bugs and features only */
+.item-kind { font-size: 12px; line-height: 1; }
+
 .add-hint { margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
 
 /* ----- sheets' contents ----- */
@@ -422,7 +486,9 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .item-note-input::placeholder, .text-input::placeholder { color: var(--faint); }
 
 .item-dates { margin: 0; color: var(--faint); font-size: 11px; }
-#itemDelete { align-self: flex-start; }
+/* Delete on the left, Save on the right (js/tracker/item-sheet.js: nothing is saved until Save) */
+.item-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#itemSave { min-width: 110px; }
 
 .project-emoji { flex: none; font-size: 18px; line-height: 1; font-weight: 400; }
 .switch-pick .project-emoji { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-3); font-size: 19px; }
@@ -439,7 +505,7 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
   background: var(--surface-3);
   font-size: 22px;
 }
-.settings-label { margin: 2px 2px -4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.settings-label { display: block; margin: 2px 2px -4px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .emojis { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 4px; }
 .emoji {
   display: grid;
@@ -453,6 +519,29 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .emoji:active { transform: scale(0.88); }
 .emoji-custom { height: 38px; font-size: 16px; }
 
+/* project sheet: the GitHub repo, typed after a fixed "github.com/" */
+.repo-field {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 13px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 16px;                               /* 16px or more: iPhones don't zoom in when it's focused */
+}
+.repo-field:focus-within { border-color: var(--accent); }
+.repo-prefix { flex: none; color: var(--muted); }
+.repo-field input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; font-size: inherit; }
+.repo-field input:focus-visible { outline: none; }
+.repo-field input::placeholder { color: var(--faint); }
+.repo-open { flex: none; margin-left: 8px; padding: 4px 10px; border-radius: 999px; background: var(--surface-3); color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
+
+/* project list: a row's repo, one tap away */
+.switch-repo { display: grid; place-items: center; flex: none; width: 40px; height: 44px; color: var(--muted); }
+.switch-repo svg.icon { width: 18px; height: 18px; }
+.switch-repo:active { color: var(--ink); }
+
 .hues { display: flex; flex-wrap: wrap; gap: 10px; padding: 2px; }
 .hue {
   width: 28px;
@@ -463,6 +552,11 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .hue.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px hsl(var(--hue) 80% 68%); }
 .hue:active { transform: scale(0.9); }
+
+/* type-the-name confirmation (js/ui/confirm.js) */
+.confirm-text { margin: 0; line-height: 1.45; }
+.pill:disabled { opacity: 0.4; cursor: not-allowed; }
+.pill:disabled:active { transform: none; }
 
 .pill.ghost.armed { border-color: rgb(248 113 113 / 0.5); color: var(--danger); }
 

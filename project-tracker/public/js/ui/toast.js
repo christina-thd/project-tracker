@@ -4,9 +4,9 @@ import { icon as iconHtml } from './icons.js';
 let timer = null;
 let onAction = null;
 
+// A tap dismisses it; a tap on its button (e.g. Undo) runs that too.
 $('toast').addEventListener('click', (e) => {
-  if (!(/** @type {Element} */ (e.target).closest('.toast-action'))) return;
-  const run = onAction;
+  const run = /** @type {Element} */ (e.target).closest('.toast-action') ? onAction : null;
   hide();
   run?.();
 });
@@ -18,8 +18,8 @@ function hide() {
 }
 
 /**
- * A short message at the top of the screen, always in the same place: sheets stop below it (--toast-room in
- * css/base.css), so it never covers their title or Close button. The page needs <div class="toast" id="toast">.
+ * A short message at the bottom of the screen, above the round + button (--toast-bottom in css/base.css); a tap
+ * dismisses it. The page needs <div class="toast" id="toast">.
  * `icon` (an icons.js name, e.g. 'check') shows in front of it; `action` adds a button, e.g. Undo.
  * @param {string} message
  * @param {{ error?: boolean, icon?: string | null, action?: { label: string, run: () => void } | null }} [options]
