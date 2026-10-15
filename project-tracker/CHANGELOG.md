@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+- Fix: people centered on a PC
+- Fix: + button wobbles on iPhone while scrolling
+
 ## 2.0.0
 - New screen to pick a project
 - The top bar stays in place while you scroll
