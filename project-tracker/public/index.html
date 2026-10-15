@@ -31,21 +31,24 @@
 
     <!-- ===== one person's projects ===== -->
     <div class="view" id="trackerView" hidden>
-      <header class="top">
-        <!-- the project you're on: tap to switch (js/tracker/switcher.js) -->
-        <h1 class="project-title"><span id="appName">Projects</span><button type="button" class="project-button" id="projectButton" aria-haspopup="dialog" hidden></button></h1>
-        <a class="repo-link" id="repoLink" target="_blank" rel="noopener noreferrer" hidden></a>
-        <span class="offline-badge" id="offline" title="Not connected to Home Assistant: changes from other screens show up once it's back"></span>
-        <p class="top-summary" id="summary"></p>
-        <!-- whose projects these are: tap to go back to the home screen and switch person -->
-        <button type="button" class="person-button" id="personButton"></button>
-      </header>
+      <!-- the header and the tabs stay pinned at the top while the list scrolls under them -->
+      <div class="tracker-head">
+        <header class="top">
+          <!-- the project you're on: tap to switch (js/tracker/switcher.js) -->
+          <h1 class="project-title"><span id="appName">Projects</span><button type="button" class="project-button" id="projectButton" aria-haspopup="dialog" hidden></button></h1>
+          <a class="repo-link" id="repoLink" target="_blank" rel="noopener noreferrer" hidden></a>
+          <span class="offline-badge" id="offline" title="Not connected to Home Assistant: changes from other screens show up once it's back"></span>
+          <p class="top-summary" id="summary"></p>
+          <!-- whose projects these are: tap to go back to the home screen and switch person -->
+          <button type="button" class="person-button" id="personButton"></button>
+        </header>
 
-      <!-- ===== phones: one status at a time; wide screens show all three columns ===== -->
-      <div class="segmented status-tabs" id="statusTabs" role="tablist">
-        <button type="button" role="tab" data-status="todo">Todo <span class="count"></span></button>
-        <button type="button" role="tab" data-status="test">Test <span class="count"></span></button>
-        <button type="button" role="tab" data-status="done">Done <span class="count"></span></button>
+        <!-- ===== phones: one status at a time; wide screens show all three columns ===== -->
+        <div class="segmented status-tabs" id="statusTabs" role="tablist">
+          <button type="button" role="tab" data-status="todo">Todo <span class="count"></span></button>
+          <button type="button" role="tab" data-status="test">Test <span class="count"></span></button>
+          <button type="button" role="tab" data-status="done">Done <span class="count"></span></button>
+        </div>
       </div>
 
       <main class="board" id="board">

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.0
+- The top bar stays in place while you scroll
+
 ## 1.1.0
 - Projects can link to their GitHub repo
 - Mark items as 🐞 bug, ✨ feature or 📝 other
