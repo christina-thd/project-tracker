@@ -2,6 +2,7 @@
 
 ## 2.0.0
 - The top bar stays in place while you scroll
+- Clearer feedback when adding items
 - Fix: toast position
 
 ## 1.1.0

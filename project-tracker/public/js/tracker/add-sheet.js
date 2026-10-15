@@ -2,8 +2,9 @@
 // clears and stays focused, so several can go in a row. Todo or Test is picked at the top (the tab you're on, at first),
 // and what it is: bug, feature or other (the last one picked, remembered on this device).
 import { sendAction } from '../shared/api.js';
-import { $, closest } from '../shared/dom.js';
+import { $, closest, escapeHtml } from '../shared/dom.js';
 import { storage } from '../shared/storage.js';
+import { statusLabel } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 import { createKindPicker } from './kind-picker.js';
@@ -21,7 +22,15 @@ export function createAddSheet({ getProjects, onAdded }) {
   let projectId = null;                            // the project it was opened for: always adds there
   let status = 'todo';
   let sending = false;
-  let added = 0;                                   // in this opening of the sheet
+  let flash = null;                                // the + showing ✓ for a moment after adding
+  let fade = null;                                 // the "Added …" line going back to the hint after a while
+  const HINT = 'Tap + to add. It stays open for the next one.';
+
+  function showHint() {
+    clearTimeout(fade);
+    $('addHint').textContent = HINT;
+    $('addHint').classList.remove('added');
+  }
 
   const sheet = createSheet($('addLayer'), { onClose: () => input.blur() });
   const kind = createKindPicker($('addKind'), {
@@ -42,7 +51,7 @@ export function createAddSheet({ getProjects, onAdded }) {
       button.setAttribute('aria-checked', String(selected));
     }
     input.placeholder = PLACEHOLDER[status];
-    $('addSend').innerHTML = icon('plus');
+    if (!$('addSend').classList.contains('added')) $('addSend').innerHTML = icon('plus');
   }
 
   $('addStatus').addEventListener('click', (e) => {
@@ -62,8 +71,7 @@ export function createAddSheet({ getProjects, onAdded }) {
     try {
       await sendAction({ type: 'addItem', projectId: project.id, text, status, kind: kind.value });
       input.value = '';
-      added++;
-      $('addHint').textContent = `Added ${added}. Type the next one, or tap Close.`;
+      showAdded(text);
       onAdded(status);
     } catch (err) {
       toastError(err);
@@ -73,16 +81,33 @@ export function createAddSheet({ getProjects, onAdded }) {
     }
   });
 
+  /** It's in: said under the field (green, with a little pop, for a few seconds) and with a ✓ on the + for a moment. */
+  function showAdded(text) {
+    const hint = $('addHint');
+    hint.innerHTML = `${icon('check')}<span>Added "${escapeHtml(text)}" to ${statusLabel(status)}</span>`;
+    hint.classList.remove('added');
+    void hint.offsetWidth;                         // restart the pop for each one
+    hint.classList.add('added');
+    clearTimeout(fade);
+    fade = setTimeout(showHint, 3000);
+    clearTimeout(flash);
+    $('addSend').innerHTML = icon('check');
+    $('addSend').classList.add('added');
+    flash = setTimeout(() => {
+      $('addSend').innerHTML = icon('plus');
+      $('addSend').classList.remove('added');
+    }, 600);
+  }
+
   return {
     /** Opens for a project, adding to `startStatus` (todo or test) at first. */
     open(id, startStatus = 'todo') {
       projectId = id;
       if (!getProject()) return;
       status = startStatus === 'test' ? 'test' : 'todo';
-      added = 0;
       kind.set(storage.get('tracker.kind'));
       input.value = '';
-      $('addHint').textContent = 'Press Enter to add. It stays open for the next one.';
+      showHint();
       render();
       sheet.open();
       input.focus();                               // in the tap itself, so phones open the keyboard

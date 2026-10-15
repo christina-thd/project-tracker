@@ -434,7 +434,16 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 /* an item's kind on the board: bugs and features only */
 .item-kind { font-size: 12px; line-height: 1; }
 
-.add-hint { margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
+.add-hint { display: flex; align-items: center; gap: 6px; min-width: 0; margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
+/* just added (js/tracker/add-sheet.js): green with a check, popping in for each one */
+.add-hint.added { color: var(--done); font-weight: 600; animation: pop 320ms var(--ease); }
+.add-hint.added span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.add-hint svg.icon { width: 14px; height: 14px; stroke-width: 2.6; }
+.add-send.added { background: var(--done); }
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.92); }
+  60% { opacity: 1; transform: scale(1.03); }
+}
 
 /* ----- sheets' contents ----- */
 
