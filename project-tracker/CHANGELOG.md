@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.0.0
+- New screen to pick a project
 - The top bar stays in place while you scroll
 - Clearer feedback when adding items
 - Add a note while adding an item

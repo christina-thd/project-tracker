@@ -29,7 +29,23 @@
       <button type="button" class="pill ghost" id="addPerson"></button>
     </div>
 
-    <!-- ===== one person's projects ===== -->
+    <!-- ===== one person's projects: pick one (js/tracker/project-list.js) ===== -->
+    <div class="view projects-view" id="projectsView" hidden>
+      <!-- someone else? back to the home screen -->
+      <button type="button" class="not-you" id="projectsPerson"></button>
+      <div class="hello">
+        <span class="hello-emoji" id="projectsEmoji"></span>
+        <h1 id="projectsTitle"></h1>
+        <p class="hello-tagline" id="projectsTagline"></p>
+      </div>
+      <div class="switch-search" id="projectsSearchRow" hidden>
+        <input type="search" class="text-input" id="projectsSearch" placeholder="Find a project" aria-label="Find a project" enterkeyhint="go">
+      </div>
+      <div class="switch-list" id="projectsList" role="list"></div>
+      <button type="button" class="pill projects-new" id="projectsNew"></button>
+    </div>
+
+    <!-- ===== one project: its Todo, Test and Done ===== -->
     <div class="view" id="trackerView" hidden>
       <!-- the header and the tabs stay pinned at the top while the list scrolls under them -->
       <div class="tracker-head">
@@ -71,14 +87,6 @@
           <p class="empty"></p>
         </section>
       </main>
-
-      <!-- ===== first run: no projects yet ===== -->
-      <section class="welcome" id="welcome" hidden>
-        <img src="img/logo.svg" alt="" width="72" height="72">
-        <h2>Track every project</h2>
-        <p>Add a project, then jot down what's still to do and what's ready to test. It's on your phone and your PC at once.</p>
-        <button type="button" class="pill primary" id="firstProject">Add your first project</button>
-      </section>
     </div>
   </div>
 
