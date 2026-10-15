@@ -6,6 +6,7 @@
 - Clearer feedback when adding items
 - Add a note while adding an item
 - Add more toasts
+- Use Home Assistant's certificate, so Android can install the app
 - Fix: toast position
 - Fix: iPhone keyboard offset
 - Fix: Clear button resets when switching tabs
