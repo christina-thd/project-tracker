@@ -5,6 +5,7 @@
 - Clearer feedback when adding items
 - Fix: toast position
 - Fix: iPhone keyboard offset
+- Fix: Clear button resets when switching tabs
 
 ## 1.1.0
 - Projects can link to their GitHub repo

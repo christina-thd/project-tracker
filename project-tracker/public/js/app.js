@@ -135,6 +135,7 @@ function showView() {
 }
 
 function setTab(status) {
+  if (clearArmed) disarmClear();
   tab = status;
   storage.set('tracker.tab', status);
   render();
