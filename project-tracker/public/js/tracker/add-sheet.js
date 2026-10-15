@@ -1,6 +1,7 @@
 // Adding items: the round + opens a sheet for the project you're on. Type, press Enter, and it's added; the field
 // clears and stays focused, so several can go in a row. Todo or Test is picked at the top (the tab you're on, at first),
-// and what it is: bug, feature or other (the last one picked, remembered on this device).
+// and what it is: bug, feature or other (the last one picked, remembered on this device). "Add a note" under the field
+// opens a notes box for that item; it closes again once the item is added.
 import { sendAction } from '../shared/api.js';
 import { $, closest, escapeHtml } from '../shared/dom.js';
 import { storage } from '../shared/storage.js';
@@ -19,6 +20,8 @@ const PLACEHOLDER = { todo: 'What needs doing?', test: 'What needs testing?' };
  */
 export function createAddSheet({ getProjects, onAdded }) {
   const input = /** @type {HTMLInputElement} */ ($('addText'));
+  const note = /** @type {HTMLTextAreaElement} */ ($('addNote'));
+  const noteToggle = $('addNoteToggle');
   let projectId = null;                            // the project it was opened for: always adds there
   let status = 'todo';
   let sending = false;
@@ -62,6 +65,24 @@ export function createAddSheet({ getProjects, onAdded }) {
     input.focus();
   });
 
+  function showNote(shown) {
+    note.hidden = !shown;
+    noteToggle.innerHTML = `${icon('note')}<span>${shown ? 'No note' : 'Add a note'}</span>`;
+    noteToggle.setAttribute('aria-expanded', String(shown));
+    if (!shown) note.value = '';
+  }
+
+  noteToggle.addEventListener('click', () => {
+    showNote(note.hidden);
+    (note.hidden ? input : note).focus();
+  });
+
+  // grows with what's typed, so nothing scrolls inside it
+  note.addEventListener('input', () => {
+    note.style.height = 'auto';
+    note.style.height = `${note.scrollHeight}px`;
+  });
+
   $('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = input.value.trim();
@@ -69,8 +90,10 @@ export function createAddSheet({ getProjects, onAdded }) {
     if (!text || sending || !project) return input.focus();
     sending = true;
     try {
-      await sendAction({ type: 'addItem', projectId: project.id, text, status, kind: kind.value });
+      await sendAction({ type: 'addItem', projectId: project.id, text, note: note.value, status, kind: kind.value });
       input.value = '';
+      showNote(false);
+      note.style.height = '';
       showAdded(text);
       onAdded(status);
     } catch (err) {
@@ -107,6 +130,7 @@ export function createAddSheet({ getProjects, onAdded }) {
       status = startStatus === 'test' ? 'test' : 'todo';
       kind.set(storage.get('tracker.kind'));
       input.value = '';
+      showNote(false);
       showHint();
       render();
       sheet.open();

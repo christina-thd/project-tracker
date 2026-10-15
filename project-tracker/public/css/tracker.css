@@ -398,6 +398,19 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .add-send svg.icon { width: 20px; height: 20px; stroke-width: 2.4; }
 .add-send:active { transform: scale(0.94); }
+/* "Add a note" under the field (js/tracker/add-sheet.js): a plain link that opens the notes box */
+.add-note-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: -4px 2px 0;
+  padding: 2px 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.add-note-toggle svg.icon { width: 15px; height: 15px; }.add-note { min-height: 64px; }
 /* Todo / Test and what it is (bug, feature, other) on one row */
 .add-options { display: flex; align-items: center; gap: 8px; }
 .add-options .segmented { flex: 1; min-width: 0; }
