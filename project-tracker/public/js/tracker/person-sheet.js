@@ -23,7 +23,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
   const custom = /** @type {HTMLInputElement} */ ($('personEmojiCustom'));
   const remove = $('personDelete');
   let personId = null;                             // null: someone new
-
+  let edited = false;                              // emoji changed while open: "Saved" on closing
   let busy = false;
 
   const sheet = createSheet($('personLayer'), {
@@ -41,17 +41,20 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     choices: PERSON_EMOJIS,
     onPick: (picked) => {
       $('personEmoji').textContent = picked;
-      if (personId) sendAction({ type: 'setPersonEmoji', personId, emoji: picked }).catch(toastError);
+      if (!personId) return;
+      edited = true;
+      sendAction({ type: 'setPersonEmoji', personId, emoji: picked }).catch(toastError);
     },
   });
 
-  /** Someone's new name, if it was changed. */
+  /** Someone's new name, if it was changed; "Saved" when anything was. */
   function saveName() {
     const person = personId && getPeople().find((p) => p.id === personId);
+    if (!person) return;
     const value = name.value.trim();
-    if (person && value && value !== person.name) {
-      sendAction({ type: 'renamePerson', personId, name: value }).catch(toastError);
-    }
+    const renamed = Boolean(value) && value !== person.name;
+    if (renamed) sendAction({ type: 'renamePerson', personId, name: value }).catch(toastError);
+    if (renamed || edited) toast(`Saved ${value || person.name}`, { icon: 'check' });
   }
 
   function renderDelete() {
@@ -70,6 +73,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
       } else {
         const { personId: created } = await sendAction({ type: 'addPerson', name: value, emoji: emoji.value });
         sheet.close();
+        toast(`Added ${value}`, { icon: 'check' });
         onCreated(created);
       }
     } catch (err) {
@@ -105,6 +109,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     open(id = null) {
       const person = id ? getPeople().find((p) => p.id === id) : null;
       personId = person?.id ?? null;
+      edited = false;
       const value = person?.emoji ?? pickPersonEmoji(getPeople());
       emoji.set(value);
       $('personEmoji').textContent = value;

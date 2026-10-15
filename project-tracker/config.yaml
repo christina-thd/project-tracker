@@ -1,6 +1,6 @@
 name: "Project Tracker"
 description: "What's still to do and what's ready to test, for every project you're working on"
-version: "1.1.0"
+version: "2.0.0"
 slug: "project_tracker"
 init: false
 arch:
@@ -17,7 +17,20 @@ ingress_port: 3200
 # or a browser tab on a PC. Not needed for the Home Assistant sidebar or app.
 ports:
   3200/tcp: 3200
+  3201/tcp: 3201
 ports_description:
   3200/tcp: "Web interface (not needed for the Home Assistant sidebar)"
+  3201/tcp: "Secure web interface, with the ssl option (to install it as an app on Android)"
+# Read-only access to the "ssl" folder, for Home Assistant's own certificate (see DOCS.md)
+map:
+  - ssl:ro
 panel_icon: "mdi:clipboard-check-outline"
 panel_title: "Projects"
+options:
+  ssl: false
+  certfile: fullchain.pem
+  keyfile: privkey.pem
+schema:
+  ssl: bool
+  certfile: str
+  keyfile: str

@@ -1,6 +1,6 @@
-// Entry point: keeps the latest people, projects and items from the server and hands them to the views: the home
-// screen (who's this?) and one person's projects. The server is the only source of truth; views never change
-// anything locally, they send actions.
+// Entry point: keeps the latest people, projects and items from the server and hands them to the three screens, each
+// a step deeper (the back button goes up one): home (who's this?), a person's projects, and one project's lists.
+// The server is the only source of truth; views never change anything locally, they send actions.
 import { sendAction, subscribe } from './shared/api.js';
 import { $ } from './shared/dom.js';
 import { plural } from './shared/format.js';
@@ -11,6 +11,7 @@ import { renderBoard, wireBoard } from './tracker/board.js';
 import { renderHome, wireHome } from './tracker/home.js';
 import { createItemSheet } from './tracker/item-sheet.js';
 import { createPersonSheet } from './tracker/person-sheet.js';
+import { createProjectList } from './tracker/project-list.js';
 import { createProjectSheet } from './tracker/project-sheet.js';
 import { createSwitcher, renderProjectButton } from './tracker/switcher.js';
 import { goBack, pushBack } from './ui/back.js';
@@ -32,8 +33,9 @@ let loaded = false;
 let person = storage.get('tracker.person');      // who's using it (an id); the home screen picks
 let current = null;                              // the project you're on (an id), remembered per person
 let tab = STATUS_IDS.includes(storage.get('tracker.tab')) ? storage.get('tracker.tab') : 'todo';
-let onHome = true;                               // the home screen is showing (else a person's projects)
-let homeBehind = false;                          // came from the home screen: the back button returns there
+/** @type {'home' | 'projects' | 'board'} */
+let screen = 'home';
+const DEPTH = { home: 0, projects: 1, board: 2 };   // history entries above the first screen (one per step in)
 
 const projectKey = () => `tracker.project.${person}`;
 const getItem = (id) => items.find((i) => i.id === id);
@@ -41,23 +43,42 @@ const getPerson = () => people.find((p) => p.id === person);
 const getProject = () => projects.find((p) => p.id === current);
 
 const itemSheet = createItemSheet({ getItem, getProjects: () => allProjects, onDeleted: offerRestore });
-let closeSwitcherNext = false;                   // a project was made from the project list: close that too
+let closeSwitcherNext = false;                   // a project was made from the switching sheet: close that too
+let openNext = null;                             // a project was made on the projects screen: open it once the sheet's gone
 const projectSheet = createProjectSheet({
   getPersonId: () => person,
   getProjects: () => projects,
   getItems: () => items,
   onCreated: (id) => {
-    showProject(id);
-    closeSwitcherNext = switcher.isOpen;
+    if (screen === 'board') {
+      showProject(id);
+      closeSwitcherNext = switcher.isOpen;
+    } else {
+      openNext = id;
+    }
   },
   onDeleted: (id) => {
-    if (id === current) showProject(projects.find((p) => p.id !== id)?.id ?? null);
+    if (id === current && screen === 'board') goBack();   // back to the projects
   },
-  // once the project sheet is gone (going back is one step at a time), the list under it can close
+  // once the project sheet is gone (going back is one step at a time), what comes next can go ahead
   onClose: () => {
     if (closeSwitcherNext) switcher.close();
     closeSwitcherNext = false;
+    const id = openNext;
+    openNext = null;
+    if (id) setTimeout(() => openProject(id), 0);
   },
+});
+const projectList = createProjectList({
+  list: $('projectsList'),
+  search: /** @type {HTMLInputElement} */ ($('projectsSearch')),
+  searchRow: $('projectsSearchRow'),
+  empty: 'No projects yet. Add your first one below.',
+  getProjects: () => projects,
+  getItems: () => items,
+  getCurrent: () => null,
+  onPick: (id) => openProject(id),
+  onEdit: (id) => projectSheet.open(id),
 });
 const switcher = createSwitcher({
   getProjects: () => projects,
@@ -90,51 +111,50 @@ const personSheet = createPersonSheet({
   },
 });
 
-// ----- the home screen and a person's projects -----
+// ----- the three screens: home → a person's projects → a project -----
 
-/** Someone picked on the home screen: their projects, and the phone's back button returns home. */
+/** Someone picked on the home screen: their projects. */
 function pickPerson(id) {
   person = id;
   storage.set('tracker.person', id);
   current = storage.get(projectKey());
   keepChoicesValid();
-  if (!homeBehind) {
-    homeBehind = true;
-    pushBack(() => {
-      homeBehind = false;
-      showHome();
-    });
-  }
-  onHome = false;
-  showView();
+  pushBack(() => showScreen('home'));
+  projectList.reset();
+  showScreen('projects');
+}
+
+/** A project picked on the projects screen: its lists. */
+function openProject(id) {
+  showProject(id);
+  pushBack(() => showScreen('projects'));
+  showScreen('board');
 }
 
 function forgetPerson() {
   person = null;
   storage.set('tracker.person', null);
-  showHome();
+  goHome();
 }
 
-/** The person button in the header: back to the home screen (through history, when that's where you came from). */
+/** The person button in the header: back to the home screen, through history (as far back as that is). */
 function goHome() {
-  if (homeBehind) goBack();
-  else showHome();
+  if (DEPTH[screen]) goBack(DEPTH[screen]);
+  else render();
 }
 
-function showHome() {
-  onHome = true;
-  showView();
-}
-
-function showView() {
+function showScreen(name) {
   if (clearArmed) disarmClear();
-  $('homeView').hidden = !onHome;
-  $('trackerView').hidden = onHome;
+  screen = name;
+  $('homeView').hidden = screen !== 'home';
+  $('projectsView').hidden = screen !== 'projects';
+  $('trackerView').hidden = screen !== 'board';
   render();
   window.scrollTo(0, 0);
 }
 
 function setTab(status) {
+  if (clearArmed) disarmClear();
   tab = status;
   storage.set('tracker.tab', status);
   render();
@@ -149,42 +169,50 @@ function showProject(id) {
 }
 
 /**
- * Keeps the choices pointing at what exists (something may be deleted on another screen): the person (else the
- * home screen), their projects, and the project you're on (else their first).
+ * Keeps the choices pointing at what exists (something may be deleted on another screen): the person (else back to
+ * the home screen), their projects, and the project you're on (else back to their projects).
  */
 function keepChoicesValid() {
   if (person && !getPerson()) {
     person = null;
     storage.set('tracker.person', null);
-    onHome = true;
+    if (screen !== 'home') goHome();
   }
   projects = allProjects.filter((p) => p.personId === person);
-  if (person && !getProject()) {
-    current = projects[0]?.id ?? null;
-    storage.set(projectKey(), current);
+  if (person && current && !getProject()) {
+    current = null;
+    storage.set(projectKey(), null);
+    if (screen === 'board') goBack();
   }
+}
+
+/** The person's emoji at the top right: tap to go back to the home screen. */
+function renderPersonButton(button, who) {
+  button.textContent = who?.emoji ?? '';
+  button.title = `${who?.name ?? ''}: switch person`;
+  button.setAttribute('aria-label', `${who?.name ?? ''}: switch person`);
 }
 
 function render() {
   if (!loaded) return;
-  if (onHome) {
-    $('homeView').hidden = false;
-    $('trackerView').hidden = true;
-    $('addButton').hidden = true;
-    return renderHome({ people, projects: allProjects, items, current: person });
-  }
+  $('addButton').hidden = screen !== 'board';
+  document.body.classList.toggle('has-fab', screen === 'board');
+  if (screen === 'home') return renderHome({ people, projects: allProjects, items, current: person });
   const who = getPerson();
-  $('personButton').textContent = who?.emoji ?? '';
-  $('personButton').title = `${who?.name ?? ''}: switch person`;
-  $('personButton').setAttribute('aria-label', `${who?.name ?? ''}: switch person`);
-  const project = getProject();
-  $('welcome').hidden = Boolean(project);
-  for (const id of ['statusTabs', 'board', 'addButton']) $(id).hidden = !project;
-  renderProjectButton(project);
-  if (!project) {
-    $('summary').textContent = '';
-    return;
+  if (screen === 'projects') {
+    $('projectsPerson').textContent = `Not ${who?.name ?? 'you'}?`;
+    $('projectsEmoji').textContent = who?.emoji ?? '';
+    $('projectsTitle').textContent = `Hi ${who?.name ?? ''}`;
+    $('projectsTagline').textContent = projects.length ? 'Pick a project to work on' : 'Add your first project to get started';
+    $('projectsNew').innerHTML = `${icon('plus')}<span>${projects.length ? 'New project' : 'Add your first project'}</span>`;
+    $('projectsNew').classList.toggle('primary', !projects.length);
+    $('projectsNew').classList.toggle('ghost', projects.length > 0);
+    return projectList.render();
   }
+  renderPersonButton($('personButton'), who);
+  const project = getProject();
+  renderProjectButton(project);
+  if (!project) return;
   if (clearArmed && !items.some((i) => i.projectId === current && i.status === 'done')) disarmClear();
   renderBoard({ project, items, tab });
   $('addButton').style.setProperty('--hue', String(project.hue));   // the + takes the project's color
@@ -247,8 +275,8 @@ trackVisibleViewport();
 addStatusIcons(document);
 wireHome({ onPick: pickPerson, onEdit: (id) => personSheet.open(id), onAdd: () => personSheet.open() });
 $('personButton').addEventListener('click', goHome);
-$('firstProject').innerHTML = `${icon('plus')}<span>Add your first project</span>`;
-$('firstProject').addEventListener('click', () => projectSheet.open());
+$('projectsPerson').addEventListener('click', goHome);
+$('projectsNew').addEventListener('click', () => projectSheet.open());
 $('addButton').innerHTML = icon('plus');
 $('addButton').addEventListener('click', openAdd);
 
@@ -289,9 +317,13 @@ subscribe((view) => {
   if (first && person) current = storage.get(projectKey());
   keepChoicesValid();
   if (first) {
-    // this device's person, straight away; nobody picked yet: the home screen
-    onHome = !getPerson();
-    showView();
+    // where this device was: its person's last project (with the screens before it in history, so back works), or
+    // their projects; nobody picked yet: the home screen
+    if (getPerson()) {
+      pushBack(() => showScreen('home'));
+      if (getProject()) pushBack(() => showScreen('projects'));
+    }
+    showScreen(!getPerson() ? 'home' : getProject() ? 'board' : 'projects');
   } else {
     render();
   }

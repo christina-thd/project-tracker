@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+- New screen to pick a project
+- The top bar stays in place while you scroll
+- Clearer feedback when adding items
+- Add a note while adding an item
+- Add more toasts
+- Use Home Assistant's certificate, so Android can install the app
+- Fix: toast position
+- Fix: iPhone keyboard offset
+- Fix: Clear button resets when switching tabs
+
 ## 1.1.0
 - Projects can link to their GitHub repo
 - Mark items as 🐞 bug, ✨ feature or 📝 other

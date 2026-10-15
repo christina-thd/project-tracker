@@ -8,6 +8,20 @@
 
 /* ----- header ----- */
 
+/* the header and the tabs: pinned at the top, the list scrolls under them. It reaches past the page's padding (top and
+   sides) so nothing shows around it. */
+.tracker-head {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  margin: calc(-10px - var(--safe-top)) -12px 0;
+  padding: calc(10px + var(--safe-top)) 12px 10px;
+  background: rgb(11 13 18 / 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 18px -12px rgb(0 0 0 / 0.9);
+}
+
 .top {
   display: flex;
   align-items: center;
@@ -99,6 +113,22 @@ body.offline .offline-badge { display: inline-flex; }
   line-height: 1;
 }
 .person-button:active { transform: scale(0.92); }
+/* ----- a person's projects: pick one (js/tracker/project-list.js) ----- */
+
+.projects-view { position: relative; max-width: 640px; margin: 0 auto; }
+/* "Not Alex?": back to the home screen to pick someone else */
+.not-you { position: absolute; top: 0; right: 0; padding: 6px 2px; color: var(--accent); font-size: 13px; font-weight: 600; }
+.hello { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 38px; text-align: center; }
+.hello-emoji { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--surface-3); font-size: 38px; line-height: 1; }
+.hello h1 { max-width: 100%; margin: 12px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 24px; font-weight: 700; }
+.hello-tagline { margin: 0; color: var(--muted); }
+.projects-view .switch-search { padding: 22px 0 0; }
+.projects-view .switch-list { margin-top: 22px; padding: 0; gap: 8px; overflow: visible; }
+.projects-view .switch-row { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.projects-view .switch-pick { min-height: 62px; padding: 10px 4px 10px 12px; gap: 12px; }
+.projects-view .switch-pick .project-emoji { width: 38px; height: 38px; border-radius: 11px; font-size: 20px; }
+@media (hover: hover) { .projects-view .switch-row:hover { background: var(--surface-2); } }
+.projects-new { width: 100%; margin-top: 14px; }
 /* ----- the project you're on: tap to switch (js/tracker/switcher.js) ----- */
 
 .project-title { display: flex; flex: 0 1 auto; min-width: 0; }
@@ -181,12 +211,8 @@ body.offline .offline-badge { display: inline-flex; }
 /* ----- status tabs (phones) and columns ----- */
 
 .status-tabs {
-  position: sticky;
-  top: calc(var(--safe-top) + 6px);
-  z-index: 5;
   margin-top: 10px;
   padding: 3px;
-  box-shadow: 0 8px 20px -6px var(--bg);
 }
 .status-tabs > button { min-height: 30px; }
 /* how many are in each list: a small badge, centered on the label */
@@ -245,6 +271,7 @@ body.offline .offline-badge { display: inline-flex; }
 /* wide screens (PC, tablet in landscape): the three columns side by side, no tabs */
 @media (min-width: 900px) {
   .app { padding-left: 28px; padding-right: 28px; }
+  .tracker-head { margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
   .status-tabs { display: none; }
   .board {
     display: grid;
@@ -334,19 +361,6 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
   text-align: center;
 }
 
-/* ----- first run ----- */
-
-.welcome {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 18vh 24px 40px;
-  text-align: center;
-}
-.welcome h2 { margin: 14px 0 0; font-size: 22px; }
-.welcome p { max-width: 340px; margin: 0 0 18px; color: var(--muted); }
-
 /* ----- the round + at the bottom right: opens the add sheet ----- */
 
 .fab {
@@ -387,6 +401,19 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .add-send svg.icon { width: 20px; height: 20px; stroke-width: 2.4; }
 .add-send:active { transform: scale(0.94); }
+/* "Add a note" under the field (js/tracker/add-sheet.js): a plain link that opens the notes box */
+.add-note-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: -4px 2px 0;
+  padding: 2px 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.add-note-toggle svg.icon { width: 15px; height: 15px; }.add-note { min-height: 64px; }
 /* Todo / Test and what it is (bug, feature, other) on one row */
 .add-options { display: flex; align-items: center; gap: 8px; }
 .add-options .segmented { flex: 1; min-width: 0; }
@@ -423,7 +450,16 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 /* an item's kind on the board: bugs and features only */
 .item-kind { font-size: 12px; line-height: 1; }
 
-.add-hint { margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
+.add-hint { display: flex; align-items: center; gap: 6px; min-width: 0; margin: -4px 2px 0; color: var(--faint); font-size: 12px; }
+/* just added (js/tracker/add-sheet.js): green with a check, popping in for each one */
+.add-hint.added { color: var(--done); font-weight: 600; animation: pop 320ms var(--ease); }
+.add-hint.added span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.add-hint svg.icon { width: 14px; height: 14px; stroke-width: 2.6; }
+.add-send.added { background: var(--done); }
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.92); }
+  60% { opacity: 1; transform: scale(1.03); }
+}
 
 /* ----- sheets' contents ----- */
 

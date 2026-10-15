@@ -12,6 +12,19 @@ const CLOSE_SPEED = 0.6;            // px per ms: a quick flick closes even when
 
 let open = 0;                       // sheets open right now: the page doesn't scroll behind them
 const stack = [];                   // the open sheets, newest last
+let pageY = 0;                      // where the page was scrolled to when the first sheet opened
+
+function lockPage() {
+  pageY = window.scrollY;
+  document.body.style.top = `-${pageY}px`;
+  document.body.classList.add('locked');
+}
+
+function unlockPage() {
+  document.body.classList.remove('locked');
+  document.body.style.top = '';
+  window.scrollTo(0, pageY);        // back where it was
+}
 
 /** Swipe down to close: the sheet follows the finger, then closes or springs back. */
 function enableDragToClose(panel, close) {
@@ -80,7 +93,7 @@ export function createSheet(layer, { onClose } = {}) {
     isOpen = false;
     closing = false;
     stack.splice(stack.indexOf(sheet), 1);
-    if (--open === 0) document.body.classList.remove('locked');
+    if (--open === 0) unlockPage();
     layer.classList.remove('open');
     const done = () => {
       if (isOpen) return;
@@ -100,10 +113,9 @@ export function createSheet(layer, { onClose } = {}) {
     open() {
       if (isOpen) return;
       isOpen = true;
-      open++;
+      if (open++ === 0) lockPage();
       stack.push(sheet);
       pushBack(hide);
-      document.body.classList.add('locked');
       panel.style.transform = '';
       layer.hidden = false;
       void panel.offsetHeight;                      // apply the closed position first, so it slides in

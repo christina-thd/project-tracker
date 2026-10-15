@@ -1,8 +1,8 @@
 project-tracker/                   Home Assistant add-on containing the app
                                    (in the repository it sits next to repository.yaml and the repo README)
-├── config.yaml                    add-on definition: version, ingress (port 3200), optional direct port
+├── config.yaml                    add-on definition: version, ingress (port 3200), direct ports (3200, https 3201),
 ├── Dockerfile                     Home Assistant base image + Node.js, copies src/ and public/
-├── run.sh                         bashio: sets STATE_FILE and PORT, starts the server
+├── run.sh                         bashio: sets STATE_FILE and PORT (and https with the ssl option), starts the server
 ├── README.md                      add-on store page: features, install
 ├── DOCS.md                        add-on Documentation tab: people, lists, adding, projects, phone and PC
 ├── CHANGELOG.md                   release notes (shown in Home Assistant)
@@ -12,26 +12,26 @@ project-tracker/                   Home Assistant add-on containing the app
 ├── eslint.config.js               lint rules (npm run lint)
 ├── tsconfig.json                  type checking of the JavaScript from JSDoc, nothing compiled (npm run typecheck)
 ├── src/                           server (Node, no framework, no dependencies)
-│   ├── server.js                  entry point: http, graceful shutdown
-│   ├── config.js                  environment variables (PORT, HOST, STATE_FILE)
+│   ├── server.js                  entry point: http (and https), graceful shutdown
+│   ├── config.js                  environment variables (PORT, HOST, STATE_FILE, HTTPS_PORT, TLS_CERT, TLS_KEY)
 │   ├── app.js                     HTTP routes: page, static files, API
 │   ├── tracker/state.js           state shape, repairing saved data, view for screens
 │   ├── tracker/actions.js         every action, validated
 │   ├── store.js                   safe JSON saving (atomic, debounced)
 │   ├── sse.js                     live updates to all screens
-│   └── static.js                  safe static file serving
+│   ├── static.js                  safe static file serving
 ├── public/                        browser (plain ES modules, no build step)
 │   ├── index.html                 the page (markup only)
 │   ├── manifest.webmanifest       "Add to Home Screen" opens it like an app
 │   ├── css/   base.css, tracker.css
 │   ├── img/   logo.svg, icon-180/192/512.png
 │   └── js/
-│       ├── app.js                 entry: latest view, who and what you're looking at, home screen ↔ projects, wiring
+│       ├── app.js                 entry: latest view, who and what you're looking at, the three screens, wiring
 │       ├── shared/  tracker.js (statuses, limits, colors, emoji; used by the server too), api, dom, format, storage
 │       ├── ui/      back, sheet, emoji-picker, confirm, viewport, toast, icons
-│       └── tracker/ home (who's this?), person-sheet, kind-picker, board, switcher, add-sheet, item-sheet, project-sheet
+│       └── tracker/ home (who's this?), person-sheet, kind-picker, board, project-list, switcher, add-sheet,
 ├── test/                          automated tests (Node's built-in runner, no extra deps):
-│                                  actions, state, store, http, addon packaging
+│                                  actions, state, store, http, tls, addon packaging (fixtures/: test certificate)
 └── docs/
     ├── DEVELOPMENT.md             dev setup, architecture, releasing, local Docker test
     └── _project_architecture.txt  this overview

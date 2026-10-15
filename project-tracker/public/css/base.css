@@ -29,8 +29,10 @@
   --safe-top: env(safe-area-inset-top, 0px);
   /* the top of the screen kept free above sheets, so it's clear there's a page under them */
   --sheet-gap: 24px;
-  /* messages (js/ui/toast.js) sit this far from the bottom: above the round + button (css/tracker.css .fab) */
-  --toast-bottom: calc(86px + var(--safe-bottom));
+  /* messages (js/ui/toast.js) sit at the bottom, level with the round + button (css/tracker.css .fab: 54px, 18px up),
+     in the space to its left */
+  --toast-bottom: calc(23px + var(--safe-bottom));
+  --toast-room: 0px;                             /* kept free on each side (for the +) */
   /* the part of the screen you can see (smaller while the keyboard is open), kept up to date by js/ui/viewport.js */
   --viewport-top: 0px;
   --viewport-height: 100dvh;
@@ -54,7 +56,9 @@ body {
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
 }
-body.locked { overflow: hidden; }
+body.locked { position: fixed; left: 0; right: 0; overflow: hidden; }   /* a sheet is open (js/ui/sheet.js) */
+/* the round + is showing (js/app.js): messages stay centered but narrow enough to keep clear of it */
+body.has-fab:not(.locked) { --toast-room: 74px; }
 
 button, input, textarea, select { font: inherit; color: inherit; }
 button { border: 0; background: none; padding: 0; cursor: pointer; touch-action: manipulation; }
@@ -185,15 +189,15 @@ svg.icon-filled { fill: currentColor; stroke: none; }
 
 .toast {
   position: fixed;
+  /* at the bottom of what you can see (above the keyboard while it's open), centered */
   left: 50%;
-  /* at the bottom of what you can see (above the keyboard while it's open), clear of the + button */
   top: calc(var(--viewport-top) + var(--viewport-height) - var(--toast-bottom));
   z-index: 40;
   display: flex;
   align-items: center;
-  gap: 8px;
-  max-width: calc(100% - 32px);
-  padding: 11px 18px;
+  gap: 7px;
+  max-width: calc(100% - 16px - 2 * var(--toast-room));
+  padding: 10px 14px;
   width: max-content;                            /* one line when it fits; wraps (never cut) when it doesn't */
   border-radius: 22px;
   border: 1px solid var(--line);
@@ -224,8 +228,8 @@ svg.icon-filled { fill: currentColor; stroke: none; }
 }
 .toast-icon svg.icon { width: 13px; height: 13px; stroke-width: 2.6; }
 .toast-action {
-  margin-left: 6px;
-  padding: 6px 14px;
+  margin-left: 2px;
+  padding: 6px 11px;
   border-radius: 999px;
   background: var(--surface);
   color: var(--accent);

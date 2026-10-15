@@ -14,6 +14,7 @@ function parsePort(value) {
  *   PORT        port to listen on (default 3200)
  *   HOST        interface to bind (default all)
  *   STATE_FILE  where projects and items are saved (default ./data/tracker.json)
+ *   HTTPS_PORT, TLS_CERT, TLS_KEY  also serve https (PEM certificate and key; off unless all three are set)
  */
 export function loadConfig(env = process.env) {
   const pkg = JSON.parse(readFileSync(path.join(ROOT_DIR, 'package.json'), 'utf8'));
@@ -22,6 +23,9 @@ export function loadConfig(env = process.env) {
     version: pkg.version,
     port: parsePort(env.PORT) ?? 3200,
     host: env.HOST || '0.0.0.0',
+    httpsPort: parsePort(env.HTTPS_PORT),
+    tlsCert: env.TLS_CERT || null,
+    tlsKey: env.TLS_KEY || null,
     stateFile: env.STATE_FILE || path.join(ROOT_DIR, 'data', 'tracker.json'),
     publicDir: path.join(ROOT_DIR, 'public'),
   });
