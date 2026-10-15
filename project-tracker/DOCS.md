@@ -7,15 +7,16 @@ Keep track of what's to do and what's ready to test, for every project you're wo
 1. Open **Projects** in the Home Assistant sidebar.
 2. Tap **Add the first person** and type your name.
 3. Tap **Add your first project** and give it a name. An emoji and a color are picked for it; change them if you like.
-4. Tap the round **+** at the bottom right, type, and press Enter. That's it: it's on the **Todo** list.
+4. Tap the round **+** at the bottom right, type, and tap **+** again (or press Enter). That's it: it's on the **Todo** list.
 
 ## People
 
 Everyone in the house has their own projects. The home screen ("Who's this?") has a tile per person, with how many
-items they have open: tap yours to see your projects. Each phone or PC remembers who picked it last, so after the first
-time it opens straight on your projects.
+items they have open: tap yours to see your projects. Each phone or PC remembers who picked it last and the project
+they were on, so after the first time it opens straight where you left off.
 
-Your emoji is at the top right: tap it (or use the back button) to go back to the home screen and pick someone else.
+To pick someone else, tap your emoji at the top right of a project, or **Not *name*?** above your projects (the back
+button works too).
 On the home screen, **Add person** adds someone, and **⋯** on a tile renames them, changes their emoji, or deletes them
 (with all their projects: type **delete** to confirm, since it can't be undone).
 
@@ -32,7 +33,8 @@ Every item is in one of three lists:
 | **Done**          | Tested and finished                      |
 
 Tap the round button in front of an item to move it to the next list: Todo → Test → Done.
-A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it.
+A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it. Saving or adding an item,
+a project or a person shows a short message there too.
 
 Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
 (e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
@@ -44,18 +46,22 @@ The round **+** at the bottom right opens a small sheet that adds to **the proje
 🐞 bug, ✨ feature or 📝 other (the last one you picked is kept). Bugs and features show their emoji in the list;
 change it any time from the item, then tap **Save**.
 
-Type and press Enter: it's added, and the field clears for the next one, so you can add several in a row.
-Tap **Close** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
+Type and tap **+** (or press Enter): it's added, a green line below says what was added, and the field clears for the
+next one, so you can add several in a row. **Add a note** opens a box for notes on it (how to test it, a link, …);
+**No note** hides it again. Tap **Close** (or swipe the sheet down) when you're finished. On a PC, press **n** (or **+**) to open it and Escape to close it.
 
 ## Projects
 
-The name at the top is the project you're on. Tap it to see all your projects (just yours), the most recently active first,
-with how many items each has in Todo and Test; tap one to switch to it. With more than a few projects there's a
-search field too: type part of a name and press Enter to jump to the first match.
+After picking yourself you see your projects (just yours): the most recently active first, with how many items each
+has in Todo and Test. Tap one to open it; the back button brings you back to the list. With more than a few projects
+there's a search field too: type part of a name and press Enter to jump to the first match.
 
-In that list, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
+Inside a project, its name is at the top: tap it for the same list in a sheet, to switch quickly. The bar at the top,
+with the Todo, Test and Done tabs, stays in place while you scroll.
+
+In both lists, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
 or deletes it (with everything in it: type **delete** to confirm, since it can't be undone). **New project** at the
-bottom adds one.
+bottom adds one and opens it.
 
 A project with a **GitHub repo** shows GitHub's logo next to its name at the top, and on its row in the project list: tap it
 to open the repo. Set it at the
@@ -77,6 +83,20 @@ title. It reconnects by itself and the badge goes away; until then, changes made
 
 To have it like an app on your phone, open the direct address `http://<your-homeassistant-ip>:3200/` in the
 browser and choose **Add to Home Screen**. It works in the Home Assistant app too, from the sidebar.
+
+## Install as an app on Android
+
+Chrome on Android only installs an app from a secure (https) address with a trusted certificate. If Home Assistant
+already has one for your own domain (e.g. Let's Encrypt, in its `ssl` folder), the add-on can use it:
+
+1. In the add-on's **Configuration** tab, turn on **ssl**. `certfile` and `keyfile` are the certificate's files in the
+   `ssl` folder (`fullchain.pem` and `privkey.pem` by default). Restart the add-on.
+2. Make your domain point to Home Assistant's address on your home network, e.g. with a DNS rewrite in your router or
+   AdGuard Home (`ha.example.com` → `192.168.1.10`).
+3. On the phone, open `https://<your-domain>:3201/` in Chrome, then ⋮ → **Install app**.
+
+Don't forward port 3201 on your router: there are no passwords, so keep it on your home network. The plain address on
+port 3200 keeps working as before, and a renewed certificate is picked up by itself.
 
 ## Your data
 

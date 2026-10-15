@@ -5,15 +5,11 @@ from your phone, and just as usable from a PC.
 
 ## Features
 
-- Everyone has their own projects: pick yourself on the home screen
-- A project per thing you work on, each with its own emoji, and a one-tap link to its GitHub repo
-- Three lists: **Todo**, **Test** and **Done**; one tap moves an item to the next
-- Mark items as 🐞 bug, ✨ feature or 📝 other
-- Quick add: tap +, type, press Enter; add several in a row
-- Notes on any item (how to test it, links, …)
-- Deleting a whole project or person asks you to type "delete" first
-- Phones show one list at a time; wide screens show all three side by side
-- Every open screen updates at once
+- Everyone has their own projects, each with an emoji and a link to its GitHub repo
+- **Todo**, **Test** and **Done** lists; one tap moves an item along
+- Quick add: tap +, type, and the next one
+- Notes and 🐞 bug / ✨ feature / 📝 other on any item
+- Phone and PC, live on every screen
 
 ## Installation
 
@@ -24,12 +20,19 @@ from your phone, and just as usable from a PC.
 
 ## Configuration
 
-None needed.
+None needed. Optional:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| ssl | bool | false | Also serve https on port 3201 with Home Assistant's own certificate, so Android can install the app |
+| certfile | str | fullchain.pem | Certificate in Home Assistant's `ssl` folder |
+| keyfile | str | privkey.pem | Its key, in the `ssl` folder |
 
 ## Usage
 
 Open **Projects** in the Home Assistant sidebar
 or go straight to `http://<your-homeassistant-ip>:3200/`.
+With `ssl` on, the secure address is `https://<your-domain>:3201/` (see the Documentation tab).
 
 ## Development
 
