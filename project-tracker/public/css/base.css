@@ -56,7 +56,7 @@ body {
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
 }
-body.locked { overflow: hidden; }
+body.locked { position: fixed; left: 0; right: 0; overflow: hidden; }   /* a sheet is open (js/ui/sheet.js) */
 
 button, input, textarea, select { font: inherit; color: inherit; }
 button { border: 0; background: none; padding: 0; cursor: pointer; touch-action: manipulation; }

@@ -4,6 +4,7 @@
 - The top bar stays in place while you scroll
 - Clearer feedback when adding items
 - Fix: toast position
+- Fix: iPhone keyboard offset
 
 ## 1.1.0
 - Projects can link to their GitHub repo
