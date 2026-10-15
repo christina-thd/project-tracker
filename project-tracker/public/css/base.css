@@ -29,8 +29,10 @@
   --safe-top: env(safe-area-inset-top, 0px);
   /* the top of the screen kept free above sheets, so it's clear there's a page under them */
   --sheet-gap: 24px;
-  /* messages (js/ui/toast.js) sit this far from the bottom: above the round + button (css/tracker.css .fab) */
-  --toast-bottom: calc(86px + var(--safe-bottom));
+  /* messages (js/ui/toast.js) sit at the bottom, level with the round + button (css/tracker.css .fab: 54px, 18px up),
+     in the space to its left */
+  --toast-bottom: calc(23px + var(--safe-bottom));
+  --toast-room-right: 82px;
   /* the part of the screen you can see (smaller while the keyboard is open), kept up to date by js/ui/viewport.js */
   --viewport-top: 0px;
   --viewport-height: 100dvh;
@@ -185,14 +187,14 @@ svg.icon-filled { fill: currentColor; stroke: none; }
 
 .toast {
   position: fixed;
-  left: 50%;
-  /* at the bottom of what you can see (above the keyboard while it's open), clear of the + button */
+  /* at the bottom of what you can see (above the keyboard while it's open), centered in the space left of the + */
+  left: calc(50% - var(--toast-room-right) / 2 + 8px);
   top: calc(var(--viewport-top) + var(--viewport-height) - var(--toast-bottom));
   z-index: 40;
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: calc(100% - 32px);
+  max-width: calc(100% - 16px - var(--toast-room-right));
   padding: 11px 18px;
   width: max-content;                            /* one line when it fits; wraps (never cut) when it doesn't */
   border-radius: 22px;
