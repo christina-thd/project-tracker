@@ -5,6 +5,7 @@
 - The top bar stays in place while you scroll
 - Clearer feedback when adding items
 - Add a note while adding an item
+- Add more toasts
 - Fix: toast position
 - Fix: iPhone keyboard offset
 - Fix: Clear button resets when switching tabs

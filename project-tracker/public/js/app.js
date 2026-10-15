@@ -196,6 +196,7 @@ function renderPersonButton(button, who) {
 function render() {
   if (!loaded) return;
   $('addButton').hidden = screen !== 'board';
+  document.body.classList.toggle('has-fab', screen === 'board');
   if (screen === 'home') return renderHome({ people, projects: allProjects, items, current: person });
   const who = getPerson();
   if (screen === 'projects') {

@@ -5,7 +5,7 @@ import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
 import { dateTime } from '../shared/format.js';
 import { statusLabel } from '../shared/tracker.js';
-import { icon } from '../ui/icons.js';
+import { icon, STATUS_ICONS } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 import { createKindPicker } from './kind-picker.js';
 import { toast, toastError } from '../ui/toast.js';
@@ -82,6 +82,8 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       if (Object.keys(changes).length) await sendAction({ type: 'editItem', itemId: item.id, ...changes });
       if (status !== item.status) await sendAction({ type: 'setStatus', itemId: item.id, status });
       sheet.close();
+      if (status !== item.status) toast(status === 'done' ? 'Done' : `Moved to ${statusLabel(status)}`, { icon: STATUS_ICONS[status] });
+      else if (Object.keys(changes).length) toast('Saved', { icon: 'check' });
     } catch (err) {
       toastError(err);
     } finally {

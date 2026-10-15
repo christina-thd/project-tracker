@@ -31,6 +31,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
   let hue = 0;
   let emojiChosen = false;                         // picked by hand: typing the name no longer changes it
   let clearArmed = false;                          // Clear tapped once: the next tap clears (it can't be undone)
+  let edited = false;                              // emoji or color changed while open: "Saved" on closing
   let busy = false;
 
   const sheet = createSheet($('projectLayer'), {
@@ -52,17 +53,22 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     return true;
   }
 
-  /** An existing project's new name and link, if they were changed. */
+  /** An existing project's new name and link, if they were changed; "Saved" when anything was. */
   function saveTyped() {
     const project = projectId && getProjects().find((p) => p.id === projectId);
     if (!project) return;
+    let changed = edited;
     const value = name.value.trim();
     if (value && value !== project.name) {
       sendAction({ type: 'renameProject', projectId, name: value }).catch(toastError);
+      changed = true;
     }
-    if (urlChanged() && !badUrl()) {
+    if (urlChanged()) {
+      if (badUrl()) return;
       sendAction({ type: 'setProjectUrl', projectId, url: githubUrl(url.value) }).catch(toastError);
+      changed = true;
     }
+    if (changed) toast(`Saved ${value || project.name}`, { icon: 'check' });
   }
 
   const itemsOf = (id) => getItems().filter((i) => i.projectId === id);
@@ -74,7 +80,9 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     onPick: (picked) => {
       emojiChosen = true;
       $('projectEmoji').textContent = picked;
-      if (projectId) sendAction({ type: 'setProjectEmoji', projectId, emoji: picked }).catch(toastError);
+      if (!projectId) return;
+      edited = true;
+      sendAction({ type: 'setProjectEmoji', projectId, emoji: picked }).catch(toastError);
     },
   });
 
@@ -121,7 +129,9 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     if (!button) return;
     hue = Number(button.dataset.hue);
     renderHues();
-    if (projectId) sendAction({ type: 'setProjectHue', projectId, hue }).catch(toastError);
+    if (!projectId) return;
+    edited = true;
+    sendAction({ type: 'setProjectHue', projectId, hue }).catch(toastError);
   });
 
   $('projectForm').addEventListener('submit', async (e) => {
@@ -138,6 +148,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
           type: 'addProject', personId: getPersonId(), name: value, emoji: emoji.value, hue, url: githubUrl(url.value),
         });
         sheet.close();
+        toast(`Added ${value}`, { icon: 'check' });
         onCreated(created);
       }
     } catch (err) {
@@ -186,6 +197,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       const project = id ? getProjects().find((p) => p.id === id) : null;
       projectId = project?.id ?? null;
       clearArmed = false;
+      edited = false;
       hue = project?.hue ?? pickHue(getProjects());
       emojiChosen = false;
       showEmoji(project?.emoji ?? pickEmoji(getProjects()));
