@@ -72,6 +72,12 @@
           <h2 class="column-head"><span class="column-label"><span class="column-dot"></span>Todo <span class="count"></span></span></h2>
           <ul class="list"></ul>
           <p class="empty"></p>
+          <div class="backlog" id="backlog" hidden>
+            <button type="button" class="backlog-head" id="backlogToggle" aria-controls="backlogList">
+              <span class="backlog-title"></span><span class="backlog-toggle"></span>
+            </button>
+            <ul class="list backlog-list" id="backlogList"></ul>
+          </div>
         </section>
         <section class="column" data-status="test">
           <h2 class="column-head"><span class="column-label"><span class="column-dot"></span>Test <span class="count"></span></span></h2>
@@ -138,6 +144,7 @@
           <button type="button" role="radio" data-status="test">Test</button>
           <button type="button" role="radio" data-status="done">Done</button>
         </div>
+        <button type="button" class="backlog-move" id="itemBacklog"></button>
         <div class="kinds item-kinds" id="itemKind" role="radiogroup" aria-label="Kind"></div>
         <textarea class="item-note-input" id="itemNote" rows="3" maxlength="2000"
           placeholder="Notes: how to test it, links, anything…" aria-label="Notes"></textarea>

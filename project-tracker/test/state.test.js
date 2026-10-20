@@ -16,7 +16,10 @@ test('a saved tracker comes back as it was', () => {
     schema: SCHEMA_VERSION,
     people: [{ id: 'ab', name: 'Chris', emoji: '🦊', createdAt: NOW - 20 }],
     projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', createdAt: NOW - 10 }],
-    items: [{ id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1 }],
+    items: [
+      { id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1 },
+      { id: 'cd', projectId: 'aa', text: 'Later', note: '', status: 'backlog', kind: 'other', createdAt: NOW - 5, movedAt: NOW - 2 },
+    ],
   };
   assert.deepEqual(normalizeState(structuredClone(saved), NOW), saved);
 });

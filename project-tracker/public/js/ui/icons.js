@@ -8,7 +8,9 @@ const PATHS = {
   flask: '<path d="M9 3h6M10 3v6.5L5.2 17.8A2.2 2.2 0 0 0 7.1 21h9.8a2.2 2.2 0 0 0 1.9-3.2L14 9.5V3"/><path d="M7.5 15h9"/>',
   note: '<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/>',
   dots: '<path d="M6 12h.01M12 12h.01M18 12h.01"/>',
-  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  // a storage box: the backlog
+  box: '<path d="M3 5h18v4H3z"/><path d="M5 9v10h14V9"/><path d="M10 13h4"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chevron: '<path d="m7 10 5 5 5-5"/>',
   // </> : a project's code repository
   code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
@@ -30,8 +32,8 @@ export function icon(name) {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${PATHS[name] ?? ''}</svg>`;
 }
 
-/** Each status's icon: todo an empty circle, test a test tube, done a check. */
-export const STATUS_ICONS = Object.freeze({ todo: 'circle', test: 'flask', done: 'check' });
+/** Each status's icon: todo an empty circle, test a test tube, done a check, backlog a box. */
+export const STATUS_ICONS = Object.freeze({ todo: 'circle', test: 'flask', done: 'check', backlog: 'box' });
 
 /**
  * Puts its status's icon in front of every [data-status] button and column dot inside `root` (tabs, the add and

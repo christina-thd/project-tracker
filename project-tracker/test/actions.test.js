@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  cleanUrl, EMOJIS, firstEmoji, githubRepo, githubUrl, HUES, isEmoji, MAX_ITEMS, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, nextStatus, PERSON_EMOJIS, pickEmoji,
+  cleanUrl, EMOJIS, firstEmoji, githubRepo, githubUrl, HUES, isEmoji, isOpen, MAX_ITEMS, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, nextStatus, PERSON_EMOJIS, pickEmoji,
 } from '../public/js/shared/tracker.js';
 import { ACTION_TYPES, ActionError, applyAction } from '../src/tracker/actions.js';
 import { createInitialState } from '../src/tracker/state.js';
@@ -165,6 +165,17 @@ test('the round button goes to do → to test → done, and stops there', () => 
   assert.equal(nextStatus('todo'), 'test');
   assert.equal(nextStatus('test'), 'done');
   assert.equal(nextStatus('done'), null);
+});
+
+test('an item can go to the backlog and back; it is not open, and the round button skips it', () => {
+  const { state, projectId } = setup();
+  const { itemId } = act(state, { type: 'addItem', projectId, text: 'Sign in with Google' });
+  act(state, { type: 'setStatus', itemId, status: 'backlog' }, T0 + 1000);
+  assert.deepEqual([state.items[0].status, state.items[0].movedAt], ['backlog', T0 + 1000]);
+  assert.equal(isOpen('backlog'), false);
+  assert.equal(nextStatus('backlog'), null);
+  act(state, { type: 'setStatus', itemId, status: 'todo' });
+  assert.equal(state.items[0].status, 'todo');
 });
 
 test('editing changes only what is given, and never the project', () => {

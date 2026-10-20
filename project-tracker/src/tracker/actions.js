@@ -1,6 +1,6 @@
 import {
   cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
-  pickPersonEmoji, STATUS_IDS,
+  ITEM_STATUS_IDS, pickPersonEmoji,
 } from '../../public/js/shared/tracker.js';
 import { cleanText, findItem, findPerson, findProject, newId, sameName } from './state.js';
 
@@ -160,7 +160,7 @@ const handlers = {
       projectId,
       text: clean,
       note: cleanText(note, MAX_NOTE, { multiline: true }),
-      status: oneOf(status ?? 'todo', STATUS_IDS, 'status'),
+      status: oneOf(status ?? 'todo', ITEM_STATUS_IDS, 'status'),
       kind: oneOf(kind ?? DEFAULT_KIND, KIND_IDS, 'kind'),
       createdAt: now,
       movedAt: now,
@@ -186,7 +186,7 @@ const handlers = {
 
   setStatus(state, { itemId, status }, now) {
     const item = getItem(state, itemId);
-    oneOf(status, STATUS_IDS, 'status');
+    oneOf(status, ITEM_STATUS_IDS, 'status');
     if (item.status === status) return;
     item.status = status;
     item.movedAt = now;

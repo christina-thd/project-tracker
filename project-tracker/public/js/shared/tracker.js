@@ -1,7 +1,7 @@
 // What the tracker is made of, shared by the server (validation) and the page (labels, colors).
 
 /**
- * @typedef {'todo' | 'test' | 'done'} Status
+ * @typedef {'todo' | 'test' | 'done' | 'backlog'} Status
  * @typedef {{ id: string, name: string, emoji: string, createdAt: number }} Person
  *   someone in the house: each person has their own projects (picked on the home screen; no passwords)
  * @typedef {{ id: string, personId: string, name: string, emoji: string, hue: number, url: string | null,
@@ -22,8 +22,16 @@ export const STATUSES = Object.freeze([
 ]);
 export const STATUS_IDS = Object.freeze(STATUSES.map((s) => s.id));
 
+/** Items that couldn't be done for now: out of the three lists, shown dimmed under Todo. */
+export const BACKLOG = 'backlog';
+/** Every status an item can have: the three lists and the backlog. */
+export const ITEM_STATUS_IDS = Object.freeze([...STATUS_IDS, BACKLOG]);
+
+/** Still to do or to test (not done, not in the backlog). */
+export const isOpen = (status) => status === 'todo' || status === 'test';
+
 /** @param {string} status */
-export const statusLabel = (status) => STATUSES.find((s) => s.id === status)?.label ?? status;
+export const statusLabel = (status) => (status === BACKLOG ? 'Backlog' : STATUSES.find((s) => s.id === status)?.label ?? status);
 
 /** Where the round button on an item takes it; null once done. */
 export function nextStatus(status) {

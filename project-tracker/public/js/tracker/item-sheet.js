@@ -1,10 +1,10 @@
 // One item: what it says, its notes, its status and kind (its project is shown, not changed here). Changes are kept in the
 // sheet until Save (bottom right) sends them all; Close, swiping down, back or Escape leave without saving.
-// Delete applies right away (after a second tap).
+// Delete applies right away (after a second tap); so does Move to backlog.
 import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
 import { dateTime } from '../shared/format.js';
-import { statusLabel } from '../shared/tracker.js';
+import { BACKLOG, statusLabel } from '../shared/tracker.js';
 import { icon, STATUS_ICONS } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 import { createKindPicker } from './kind-picker.js';
@@ -113,6 +113,14 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
 
   $('itemSave').addEventListener('click', save);
 
+  // Into the backlog (or back out to Todo) right away, with whatever else was changed
+  $('itemBacklog').addEventListener('click', () => {
+    const item = itemId && getItem(itemId);
+    if (!item) return;
+    status = item.status === BACKLOG ? 'todo' : BACKLOG;
+    save();
+  });
+
   text.addEventListener('input', () => fit(text));
   note.addEventListener('input', () => fit(note));
   // Enter in the title finishes it (it's one line, however long)
@@ -152,6 +160,9 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       renderStatus();
       render(item);
       $('itemSave').innerHTML = `${icon('check')}<span>Save</span>`;
+      $('itemBacklog').innerHTML = item.status === BACKLOG
+        ? `${icon(STATUS_ICONS.todo)}<span>Back to Todo</span>`
+        : `${icon(STATUS_ICONS.backlog)}<span>Move to backlog</span>`;
       sheet.open();
       requestAnimationFrame(() => {
         fit(text);
