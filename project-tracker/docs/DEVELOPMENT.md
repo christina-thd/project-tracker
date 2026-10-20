@@ -54,7 +54,7 @@ public/                   browser (plain ES modules, no build step)
                           confirm (type "delete" before deleting a project or a person),
                           viewport (keeps sheets above the keyboard), toast (messages at the bottom, with Undo; a tap dismisses), icons
   js/tracker/             kind-picker (bug / feature / other, by emoji), home (who's this? a tile per person), person-sheet (new / edit person),
-                          board (the three columns), clear-done (clearing done items, with Undo), project-list (a person's projects, with search: the projects
+                          board (the three columns, and the backlog under Todo), clear-done (clearing done items, with Undo), project-list (a person's projects, with search: the projects
                           screen and the switcher use it), switcher (header project button + the project list sheet),
                           add-sheet (the + button's sheet), item-sheet (one item), project-sheet (new / edit project)
 
@@ -72,7 +72,8 @@ only render the latest view.
 (for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `setProjectUrl` (its repo link: any web address, `cleanUrl`; the
 project sheet takes a GitHub repo, `githubUrl` / `githubRepo` in `public/js/shared/tracker.js`), `removeProject` (with its items), `addItem`,
 `editItem`, `setStatus`, `removeItem`, `clearDone`. See `src/tracker/actions.js`. Statuses are `todo`, `test` and
-`done` (`STATUSES` in `public/js/shared/tracker.js`); `movedAt` records when an item got its status, and lists show
+`done` (`STATUSES` in `public/js/shared/tracker.js`), plus `backlog` (`ITEM_STATUS_IDS`): out of the three lists,
+not open (`isOpen`), shown dimmed under Todo; `movedAt` records when an item got its status, and lists show
 the latest first.
 
 **People.** Everyone has their own projects (`project.personId`); project names are unique per person. There are
@@ -88,8 +89,8 @@ version reloads itself.
 **Phone and PC:** the page has the three columns in it always. Below 900px wide only the one picked by the tabs
 shows; above, all three sit side by side and the tabs hide (`css/tracker.css`).
 
-**Remembered per device** (localStorage, `js/shared/storage.js`): who you are, the project you were on (per person)
-and the tab. Reopening goes straight back to that project, with home and the projects screen behind it in
+**Remembered per device** (localStorage, `js/shared/storage.js`): who you are, the project you were on (per person),
+the tab and whether the backlog is hidden. Reopening goes straight back to that project, with home and the projects screen behind it in
 history. There's no "all projects" view: on the board you're always on one project, and the + adds to it.
 
 **Screens:** home ("Who's this?") → a person's projects → a project's board. Only the board has the + button

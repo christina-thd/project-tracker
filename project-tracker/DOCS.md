@@ -39,6 +39,13 @@ a project or a person shows one too, with **Undo** to put it back as it was.
 Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
 (e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
 
+## The backlog
+
+For things that can't be done for now, without deleting them: open the item and tap **Move to backlog**, under its
+list. It leaves the three lists and isn't counted as open. The backlog shows dimmed and grey at the bottom of Todo,
+only when it has something in it; **Hide** folds it away (each phone or PC remembers that) and **Show** brings it back.
+Tap an item in it to open it, then **Back to Todo**, or pick any list and tap **Save**.
+
 ## Adding things quickly
 
 The round **+** at the bottom right opens a small sheet that adds to **the project you're on**. Pick **Todo** or
