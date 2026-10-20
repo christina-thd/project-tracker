@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.0.1
+- Undo on more toasts
 - Fix: people centered on a PC
 - Fix: + button wobbles on iPhone while scrolling
 

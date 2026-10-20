@@ -54,7 +54,7 @@ public/                   browser (plain ES modules, no build step)
                           confirm (type "delete" before deleting a project or a person),
                           viewport (keeps sheets above the keyboard), toast (messages at the bottom, with Undo; a tap dismisses), icons
   js/tracker/             kind-picker (bug / feature / other, by emoji), home (who's this? a tile per person), person-sheet (new / edit person),
-                          board (the three columns), project-list (a person's projects, with search: the projects
+                          board (the three columns), clear-done (clearing done items, with Undo), project-list (a person's projects, with search: the projects
                           screen and the switcher use it), switcher (header project button + the project list sheet),
                           add-sheet (the + button's sheet), item-sheet (one item), project-sheet (new / edit project)
 
