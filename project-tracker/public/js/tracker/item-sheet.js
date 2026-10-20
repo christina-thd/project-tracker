@@ -1,10 +1,10 @@
 // One item: what it says, its notes, its status and kind (its project is shown, not changed here). Changes are kept in the
 // sheet until Save (bottom right) sends them all; Close, swiping down, back or Escape leave without saving.
-// Delete applies right away (after a second tap).
+// Delete applies right away (after a second tap); so does Move to backlog.
 import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
 import { dateTime } from '../shared/format.js';
-import { statusLabel } from '../shared/tracker.js';
+import { BACKLOG, statusLabel } from '../shared/tracker.js';
 import { icon, STATUS_ICONS } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 import { createKindPicker } from './kind-picker.js';
@@ -77,17 +77,30 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
     if (newText !== item.text) changes.text = newText;
     if (note.value.trim() !== item.note) changes.note = note.value.trim();
     if (kind.value !== item.kind) changes.kind = kind.value;
+    const edited = Object.keys(changes).length > 0;
+    const moved = status !== item.status;
     saving = true;
     try {
-      if (Object.keys(changes).length) await sendAction({ type: 'editItem', itemId: item.id, ...changes });
-      if (status !== item.status) await sendAction({ type: 'setStatus', itemId: item.id, status });
+      if (edited) await sendAction({ type: 'editItem', itemId: item.id, ...changes });
+      if (moved) await sendAction({ type: 'setStatus', itemId: item.id, status });
       sheet.close();
-      if (status !== item.status) toast(status === 'done' ? 'Done' : `Moved to ${statusLabel(status)}`, { icon: STATUS_ICONS[status] });
-      else if (Object.keys(changes).length) toast('Saved', { icon: 'check' });
+      const action = { label: 'Undo', run: () => undo(item, edited, moved) };
+      if (moved) toast(status === 'done' ? 'Done' : `Moved to ${statusLabel(status)}`, { icon: STATUS_ICONS[status], action });
+      else if (edited) toast('Saved', { icon: 'check', action });
     } catch (err) {
       toastError(err);
     } finally {
       saving = false;
+    }
+  }
+
+  /** Puts the item back as it was before Save. */
+  async function undo(before, edited, moved) {
+    try {
+      if (edited) await sendAction({ type: 'editItem', itemId: before.id, text: before.text, note: before.note, kind: before.kind });
+      if (moved) await sendAction({ type: 'setStatus', itemId: before.id, status: before.status });
+    } catch (err) {
+      toastError(err);
     }
   }
 
@@ -99,6 +112,14 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
   });
 
   $('itemSave').addEventListener('click', save);
+
+  // Into the backlog (or back out to Todo) right away, with whatever else was changed
+  $('itemBacklog').addEventListener('click', () => {
+    const item = itemId && getItem(itemId);
+    if (!item) return;
+    status = item.status === BACKLOG ? 'todo' : BACKLOG;
+    save();
+  });
 
   text.addEventListener('input', () => fit(text));
   note.addEventListener('input', () => fit(note));
@@ -139,6 +160,9 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       renderStatus();
       render(item);
       $('itemSave').innerHTML = `${icon('check')}<span>Save</span>`;
+      $('itemBacklog').innerHTML = item.status === BACKLOG
+        ? `${icon(STATUS_ICONS.todo)}<span>Back to Todo</span>`
+        : `${icon(STATUS_ICONS.backlog)}<span>Move to backlog</span>`;
       sheet.open();
       requestAnimationFrame(() => {
         fit(text);

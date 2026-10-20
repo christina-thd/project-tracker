@@ -3,11 +3,11 @@
 // The server is the only source of truth; views never change anything locally, they send actions.
 import { sendAction, subscribe } from './shared/api.js';
 import { $ } from './shared/dom.js';
-import { plural } from './shared/format.js';
 import { storage } from './shared/storage.js';
 import { nextStatus, statusLabel, STATUS_IDS } from './shared/tracker.js';
 import { createAddSheet } from './tracker/add-sheet.js';
 import { renderBoard, wireBoard } from './tracker/board.js';
+import { clearDone } from './tracker/clear-done.js';
 import { renderHome, wireHome } from './tracker/home.js';
 import { createItemSheet } from './tracker/item-sheet.js';
 import { createPersonSheet } from './tracker/person-sheet.js';
@@ -248,9 +248,9 @@ function offerRestore(item) {
   });
 }
 
-// Clearing done items can't be undone: the first tap asks, a second one (within a few seconds) clears.
+// Clearing done items: the first tap asks, a second one (within a few seconds) clears.
 let clearArmed = null;
-function clearDone() {
+function tapClear() {
   if (!clearArmed) {
     $('clearDone').textContent = 'Clear all?';
     $('clearDone').classList.add('armed');
@@ -258,9 +258,7 @@ function clearDone() {
     return;
   }
   disarmClear();
-  sendAction({ type: 'clearDone', projectId: current })
-    .then(({ removed }) => toast(`Cleared ${plural(removed, 'done item')}`, { icon: 'check' }))
-    .catch(toastError);
+  clearDone(current, items);
 }
 function disarmClear() {
   clearTimeout(clearArmed);
@@ -286,7 +284,7 @@ wireBoard({
   onTab: setTab,
   onAdvance: advance,
   onOpen: (id) => itemSheet.open(id),
-  onClearDone: clearDone,
+  onClearDone: tapClear,
 });
 
 // On a PC: Escape closes the open sheet (like the back button); "n" or "+" opens the add sheet

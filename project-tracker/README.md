@@ -6,7 +6,7 @@ from your phone, and just as usable from a PC.
 ## Features
 
 - Everyone has their own projects, each with an emoji and a link to its GitHub repo
-- **Todo**, **Test** and **Done** lists; one tap moves an item along
+- **Todo**, **Test** and **Done** lists, and a backlog for later; one tap moves an item along
 - Quick add: tap +, type, and the next one
 - Notes and 🐞 bug / ✨ feature / 📝 other on any item
 - Phone and PC, live on every screen

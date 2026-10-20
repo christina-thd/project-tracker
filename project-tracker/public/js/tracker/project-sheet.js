@@ -10,6 +10,7 @@ import { createEmojiPicker } from '../ui/emoji-picker.js';
 import { icon } from '../ui/icons.js';
 import { createSheet } from '../ui/sheet.js';
 import { toast, toastError } from '../ui/toast.js';
+import { clearDone } from './clear-done.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
 /** @typedef {import('../shared/tracker.js').Item} Item */
@@ -30,8 +31,9 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
   let projectId = null;                            // null: a new project
   let hue = 0;
   let emojiChosen = false;                         // picked by hand: typing the name no longer changes it
-  let clearArmed = false;                          // Clear tapped once: the next tap clears (it can't be undone)
+  let clearArmed = false;                          // Clear tapped once: the next tap clears
   let edited = false;                              // emoji or color changed while open: "Saved" on closing
+  let before = null;                               // the project as it was when opened, for Undo
   let busy = false;
 
   const sheet = createSheet($('projectLayer'), {
@@ -68,7 +70,35 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       sendAction({ type: 'setProjectUrl', projectId, url: githubUrl(url.value) }).catch(toastError);
       changed = true;
     }
-    if (changed) toast(`Saved ${value || project.name}`, { icon: 'check' });
+    if (changed) {
+      const old = before;
+      toast(`Saved ${value || project.name}`, { icon: 'check', action: { label: 'Undo', run: () => restore(old) } });
+    }
+  }
+
+  /** Undo of "Saved": the project's name, link, emoji and color as they were. */
+  async function restore(old) {
+    const project = getProjects().find((p) => p.id === old.id);
+    if (!project) return;
+    try {
+      if (project.name !== old.name) await sendAction({ type: 'renameProject', projectId: old.id, name: old.name });
+      if (project.url !== old.url) await sendAction({ type: 'setProjectUrl', projectId: old.id, url: old.url ?? '' });
+      if (project.emoji !== old.emoji) await sendAction({ type: 'setProjectEmoji', projectId: old.id, emoji: old.emoji });
+      if (project.hue !== old.hue) await sendAction({ type: 'setProjectHue', projectId: old.id, hue: old.hue });
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
+  /** Undo of "Added": takes the new project away again, unless something was added to it since. */
+  async function unadd(id) {
+    if (itemsOf(id).length) return toast('It has items now: delete it from its ⋯ instead', { error: true });
+    try {
+      await sendAction({ type: 'removeProject', projectId: id });
+      onDeleted(id);
+    } catch (err) {
+      toastError(err);
+    }
   }
 
   const itemsOf = (id) => getItems().filter((i) => i.projectId === id);
@@ -148,7 +178,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
           type: 'addProject', personId: getPersonId(), name: value, emoji: emoji.value, hue, url: githubUrl(url.value),
         });
         sheet.close();
-        toast(`Added ${value}`, { icon: 'check' });
+        toast(`Added ${value}`, { icon: 'check', action: { label: 'Undo', run: () => unadd(created) } });
         onCreated(created);
       }
     } catch (err) {
@@ -165,9 +195,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       return renderExtra();
     }
     clearArmed = false;
-    sendAction({ type: 'clearDone', projectId })
-      .then(({ removed }) => toast(`Cleared ${plural(removed, 'done item')}`, { icon: 'check' }))
-      .catch(toastError);
+    clearDone(projectId, getItems());
   });
 
   // A whole project goes, with everything in it, for good: type "delete" to confirm (js/ui/confirm.js).
@@ -196,6 +224,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     open(id = null) {
       const project = id ? getProjects().find((p) => p.id === id) : null;
       projectId = project?.id ?? null;
+      before = project && { ...project };
       clearArmed = false;
       edited = false;
       hue = project?.hue ?? pickHue(getProjects());

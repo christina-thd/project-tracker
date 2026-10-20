@@ -34,10 +34,17 @@ Every item is in one of three lists:
 
 Tap the round button in front of an item to move it to the next list: Todo → Test → Done.
 A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it. Saving or adding an item,
-a project or a person shows a short message there too.
+a project or a person shows one too, with **Undo** to put it back as it was.
 
 Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
 (e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
+
+## The backlog
+
+For things that can't be done for now, without deleting them: open the item and tap **Move to backlog**, under its
+list. It leaves the three lists and isn't counted as open. The backlog shows dimmed and grey at the bottom of Todo,
+only when it has something in it; **Hide** folds it away (each phone or PC remembers that) and **Show** brings it back.
+Tap an item in it to open it, then **Back to Todo**, or pick any list and tap **Save**.
 
 ## Adding things quickly
 
@@ -71,7 +78,7 @@ Every project has an **emoji**, shown next to its name. When you add a project, 
 type ("Garden sensors" → 🌱, "Budget" → 💰); if nothing fits, it's one no other project uses yet. Pick another from
 the grid, or tap the field below it and pick any emoji from your keyboard's emoji keys. The project's **color** marks its items and the + button.
 
-**Clear** in the Done list removes the project's done items; it asks first (tap it again), as this can't be undone.
+**Clear** in the Done list removes the project's done items; it asks first (tap it again), and the message after it offers **Undo**.
 
 ## Phone and PC
 

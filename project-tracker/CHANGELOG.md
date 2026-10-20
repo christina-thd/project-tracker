@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+- Undo on more toasts
+- Backlog for items that can't be done for now
+
 ## 2.0.1
 - Fix: people centered on a PC
 - Fix: + button wobbles on iPhone while scrolling

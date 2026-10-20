@@ -24,6 +24,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
   const remove = $('personDelete');
   let personId = null;                             // null: someone new
   let edited = false;                              // emoji changed while open: "Saved" on closing
+  let before = null;                               // the person as they were when opened, for Undo
   let busy = false;
 
   const sheet = createSheet($('personLayer'), {
@@ -54,7 +55,33 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     const value = name.value.trim();
     const renamed = Boolean(value) && value !== person.name;
     if (renamed) sendAction({ type: 'renamePerson', personId, name: value }).catch(toastError);
-    if (renamed || edited) toast(`Saved ${value || person.name}`, { icon: 'check' });
+    if (renamed || edited) {
+      const old = before;
+      toast(`Saved ${value || person.name}`, { icon: 'check', action: { label: 'Undo', run: () => restore(old) } });
+    }
+  }
+
+  /** Undo of "Saved": their name and emoji as they were. */
+  async function restore(old) {
+    const person = getPeople().find((p) => p.id === old.id);
+    if (!person) return;
+    try {
+      if (person.name !== old.name) await sendAction({ type: 'renamePerson', personId: old.id, name: old.name });
+      if (person.emoji !== old.emoji) await sendAction({ type: 'setPersonEmoji', personId: old.id, emoji: old.emoji });
+    } catch (err) {
+      toastError(err);
+    }
+  }
+
+  /** Undo of "Added": takes them away again, unless they have projects by now. */
+  async function unadd(id) {
+    if (getProjects().some((p) => p.personId === id)) return toast('They have projects now: delete them from their ⋯ instead', { error: true });
+    try {
+      await sendAction({ type: 'removePerson', personId: id });
+      onDeleted(id);
+    } catch (err) {
+      toastError(err);
+    }
   }
 
   function renderDelete() {
@@ -73,7 +100,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
       } else {
         const { personId: created } = await sendAction({ type: 'addPerson', name: value, emoji: emoji.value });
         sheet.close();
-        toast(`Added ${value}`, { icon: 'check' });
+        toast(`Added ${value}`, { icon: 'check', action: { label: 'Undo', run: () => unadd(created) } });
         onCreated(created);
       }
     } catch (err) {
@@ -109,6 +136,7 @@ export function createPersonSheet({ getPeople, getProjects, onCreated, onDeleted
     open(id = null) {
       const person = id ? getPeople().find((p) => p.id === id) : null;
       personId = person?.id ?? null;
+      before = person && { ...person };
       edited = false;
       const value = person?.emoji ?? pickPersonEmoji(getPeople());
       emoji.set(value);

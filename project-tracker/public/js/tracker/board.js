@@ -1,8 +1,9 @@
 // The three status columns of the project you're on. Phones show one column at a time (the tabs pick it);
-// wide screens show all three side by side (css/tracker.css).
+// wide screens show all three side by side (css/tracker.css). The backlog sits dimmed under Todo, and can be hidden.
 import { $, closest, escapeHtml } from '../shared/dom.js';
 import { ago, plural } from '../shared/format.js';
-import { DEFAULT_KIND, kindOf, nextStatus, STATUS_IDS } from '../shared/tracker.js';
+import { storage } from '../shared/storage.js';
+import { BACKLOG, DEFAULT_KIND, isOpen, kindOf, nextStatus, STATUS_IDS } from '../shared/tracker.js';
 import { icon, STATUS_ICONS } from '../ui/icons.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -16,7 +17,8 @@ const EMPTY = {
 
 const ADVANCE_LABEL = { todo: 'Move to Test', test: 'Tested: move to Done' };
 
-const open = (items) => items.filter((i) => i.status !== 'done').length;
+const open = (items) => items.filter((i) => isOpen(i.status)).length;
+const backlogHidden = () => storage.get('tracker.backlog') === 'hidden';
 
 // Items already shown, per list: only ones that just arrived in a list slide in (not every item on every update)
 const shown = new Set();
@@ -27,8 +29,10 @@ function itemHtml(item, hue, now) {
   const arrived = !firstRender && !shown.has(key);
   shown.add(key);
   const advance = nextStatus(item.status);
-  const button = advance
-    ? `<button type="button" class="advance" data-advance="${item.id}" aria-label="${ADVANCE_LABEL[item.status]}">${icon(STATUS_ICONS[item.status])}</button>`
+  const button = item.status === BACKLOG
+    ? `<span class="advance parked" aria-hidden="true">${icon(STATUS_ICONS.backlog)}</span>`
+    : advance
+    ?`<button type="button" class="advance" data-advance="${item.id}" aria-label="${ADVANCE_LABEL[item.status]}">${icon(STATUS_ICONS[item.status])}</button>`
     : `<span class="advance done" aria-hidden="true">${icon(STATUS_ICONS.done)}</span>`;
   const note = item.note ? `<span class="has-note" title="Has notes">${icon('note')}</span>` : '';
   // bugs and features show their emoji; "other" shows nothing, to keep the list calm
@@ -59,10 +63,24 @@ export function renderBoard({ project, items, tab }) {
     tabButton.classList.toggle('selected', status === tab);
     tabButton.setAttribute('aria-selected', String(status === tab));
   }
+  renderBacklog(mine.filter((i) => i.status === BACKLOG).sort((a, b) => b.movedAt - a.movedAt), project.hue, now);
   $('board').dataset.tab = tab;
   $('clearDone').hidden = !mine.some((i) => i.status === 'done');
   $('summary').textContent = plural(open(mine), 'open item');
   firstRender = false;
+}
+
+function renderBacklog(list, hue, now) {
+  $('backlog').hidden = list.length === 0;
+  $('backlogList').innerHTML = list.map((i) => itemHtml(i, hue, now)).join('');
+  $('backlog').querySelector('.backlog-title').innerHTML = `${icon('box')}<span>Backlog · ${list.length}</span>`;
+  showBacklog(!backlogHidden());
+}
+
+function showBacklog(shown) {
+  $('backlogList').hidden = !shown;
+  $('backlog').querySelector('.backlog-toggle').textContent = shown ? 'Hide' : 'Show';
+  $('backlogToggle').setAttribute('aria-expanded', String(shown));
 }
 
 /**
@@ -82,4 +100,9 @@ export function wireBoard(handlers) {
     if (item) handlers.onOpen(item.dataset.item);
   });
   $('clearDone').addEventListener('click', handlers.onClearDone);
+  $('backlogToggle').addEventListener('click', () => {
+    const hide = !backlogHidden();
+    storage.set('tracker.backlog', hide ? 'hidden' : null);
+    showBacklog(!hide);
+  });
 }

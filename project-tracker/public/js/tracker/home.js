@@ -2,6 +2,7 @@
 // ⋯ on a tile edits that person; + adds someone.
 import { $, closest, escapeHtml } from '../shared/dom.js';
 import { plural } from '../shared/format.js';
+import { isOpen } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 
 /** @typedef {import('../shared/tracker.js').Person} Person */
@@ -18,7 +19,7 @@ export function renderHome({ people, projects, items, current }) {
   $('homeTagline').hidden = people.length > 0;
   $('people').innerHTML = people.map((person) => {
     const theirs = new Set(projects.filter((p) => p.personId === person.id).map((p) => p.id));
-    const open = items.filter((i) => theirs.has(i.projectId) && i.status !== 'done').length;
+    const open = items.filter((i) => theirs.has(i.projectId) && isOpen(i.status)).length;
     const summary = theirs.size ? (open ? plural(open, 'open item') : 'All done') : 'No projects yet';
     const selected = person.id === current;
     return `<div class="person${selected ? ' selected' : ''}">
