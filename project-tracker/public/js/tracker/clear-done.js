@@ -1,4 +1,4 @@
-// Clearing a project's done items, with Undo: they come back as new items in Done, with the same text, notes and kind.
+// Clearing a project's done items, with Undo: they come back as new items in Done, with the same text, notes, link and kind.
 import { sendAction } from '../shared/api.js';
 import { plural } from '../shared/format.js';
 import { toast, toastError } from '../ui/toast.js';
@@ -23,7 +23,7 @@ export function clearDone(projectId, items) {
 async function restore(done) {
   try {
     for (const item of done) {
-      await sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: 'done', kind: item.kind });
+      await sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, link: item.link, status: 'done', kind: item.kind });
     }
   } catch (err) {
     toastError(err);

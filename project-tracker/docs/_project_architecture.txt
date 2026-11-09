@@ -30,6 +30,7 @@ project-tracker/                   Home Assistant add-on containing the app
 │       ├── shared/  tracker.js (statuses, limits, colors, emoji; used by the server too), api, dom, format, storage
 │       ├── ui/      back, sheet, emoji-picker, confirm, viewport, toast, icons
 │       └── tracker/ home (who's this?), person-sheet, kind-picker, board, clear-done, project-list, switcher, add-sheet,
+│                    item-sheet, project-sheet, reorder
 ├── test/                          automated tests (Node's built-in runner, no extra deps):
 │                                  actions, state, store, http, tls, addon packaging (fixtures/: test certificate)
 └── docs/

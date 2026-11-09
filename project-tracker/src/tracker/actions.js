@@ -1,5 +1,5 @@
 import {
-  cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
+  cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, MAX_URL, pickEmoji, pickHue,
   ITEM_STATUS_IDS, pickPersonEmoji,
 } from '../../public/js/shared/tracker.js';
 import { cleanText, findItem, findPerson, findProject, newId, sameName } from './state.js';
@@ -100,11 +100,15 @@ const handlers = {
     state.items = state.items.filter((i) => !theirs.has(i.projectId));
   },
 
-  /** Adds a project for someone, with the emoji and color given, or ones picked for it (see pickEmoji, pickHue). */
-  addProject(state, { personId, name, emoji, hue, url }, now) {
+  /**
+   * Adds a project for someone, with the emoji and color given, or ones picked for it (see pickEmoji, pickHue).
+   * `print`: a 3D printing project (its lists are named for printing, and its items have a link to the file).
+   */
+  addProject(state, { personId, name, emoji, hue, url, print = false }, now) {
     getPerson(state, personId);
     if (state.projects.length >= MAX_PROJECTS) throw new ActionError(`At most ${MAX_PROJECTS} projects`);
     if (hue != null && !isHue(hue)) throw new ActionError('hue must be a whole number from 0 to 359');
+    if (typeof print !== 'boolean') throw new ActionError('print must be true or false');
     const clean = projectName(state, personId, name);
     const theirs = state.projects.filter((p) => p.personId === personId);
     const project = {
@@ -114,6 +118,7 @@ const handlers = {
       emoji: emojiOrNull(emoji) ?? pickEmoji(theirs, clean),
       hue: hue ?? pickHue(theirs),
       url: projectUrl(url),
+      print,
       createdAt: now,
     };
     state.projects.push(project);
@@ -136,6 +141,13 @@ const handlers = {
     getProject(state, projectId).url = projectUrl(url);
   },
 
+  /** Turns a project into a 3D printing one, or back. */
+  setProjectPrint(state, { projectId, print }) {
+    const project = getProject(state, projectId);
+    if (typeof print !== 'boolean') throw new ActionError('print must be true or false');
+    project.print = print;
+  },
+
   setProjectHue(state, { projectId, hue }) {
     const project = getProject(state, projectId);
     if (!isHue(hue)) throw new ActionError('hue must be a whole number from 0 to 359');
@@ -149,8 +161,11 @@ const handlers = {
     state.items = state.items.filter((i) => i.projectId !== projectId);
   },
 
-  /** Adds an item to a project, to do unless another status is given. `note` and `kind` (bug, feature…) are optional. */
-  addItem(state, { projectId, text, note, status, kind }, now) {
+  /**
+   * Adds an item to a project, to do unless another status is given. `note`, `kind` (bug, feature…) and `link` (e.g. the
+   * file to print, as a web address or a path: any text) are optional.
+   */
+  addItem(state, { projectId, text, note, status, kind, link }, now) {
     getProject(state, projectId);
     if (state.items.length >= MAX_ITEMS) throw new ActionError(`At most ${MAX_ITEMS} items: clear some done ones first`);
     const clean = cleanText(text, MAX_TEXT);
@@ -160,20 +175,22 @@ const handlers = {
       projectId,
       text: clean,
       note: cleanText(note, MAX_NOTE, { multiline: true }),
+      link: cleanText(link, MAX_URL),
       status: oneOf(status ?? 'todo', ITEM_STATUS_IDS, 'status'),
       kind: oneOf(kind ?? DEFAULT_KIND, KIND_IDS, 'kind'),
       createdAt: now,
       movedAt: now,
+      rank: -now,                                  // on top of its list
     };
     state.items.push(item);
     return { itemId: item.id };
   },
 
   /**
-   * Changes what an item says, its note or its kind; only the fields given. An item stays in the project it was
-   * added to.
+   * Changes what an item says, its note, its kind or its link; only the fields given. An item stays in the project it
+   * was added to.
    */
-  editItem(state, { itemId, text, note, kind }) {
+  editItem(state, { itemId, text, note, kind, link }) {
     const item = getItem(state, itemId);
     const clean = text === undefined ? item.text : cleanText(text, MAX_TEXT);
     if (!clean) throw new ActionError('text is required');
@@ -182,6 +199,7 @@ const handlers = {
     item.text = clean;
     if (note !== undefined) item.note = cleanText(note, MAX_NOTE, { multiline: true });
     if (kind !== undefined) item.kind = kind;
+    if (link !== undefined) item.link = cleanText(link, MAX_URL);
   },
 
   setStatus(state, { itemId, status }, now) {
@@ -190,6 +208,22 @@ const handlers = {
     if (item.status === status) return;
     item.status = status;
     item.movedAt = now;
+    item.rank = -now;                              // on top of the list it moved to
+  },
+
+  /**
+   * Puts an item right before another one in the same list (same project and status), or last when `beforeId` is
+   * null. The list is numbered again from its first item's rank, so it keeps its place under newer items.
+   */
+  reorderItem(state, { itemId, beforeId = null }) {
+    const item = getItem(state, itemId);
+    const list = state.items.filter((i) => i.projectId === item.projectId && i.status === item.status && i !== item)
+      .sort((a, b) => a.rank - b.rank);
+    const index = beforeId === null ? list.length : list.findIndex((i) => i.id === beforeId);
+    if (index < 0) throw new ActionError('beforeId must be another item in the same list');
+    const base = Math.min(item.rank, list[0]?.rank ?? item.rank);
+    list.splice(index, 0, item);
+    list.forEach((i, n) => { i.rank = base + n; });
   },
 
   removeItem(state, { itemId }) {

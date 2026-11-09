@@ -28,7 +28,6 @@
   gap: 4px 6px;
 }
 .top h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.top-summary { margin: 0 0 0 auto; color: var(--muted); font-size: 12px; }
 /* the live connection has been down a few seconds (js/app.js): changes from other screens won't show until it's back */
 .offline-badge {
   display: none;
@@ -107,7 +106,7 @@ body.offline .offline-badge { display: inline-flex; }
   flex: none;
   width: 32px;
   height: 32px;
-  margin-left: 4px;
+  margin-left: auto;                             /* pushed to the right end */
   border-radius: 50%;
   background: var(--surface-3);
   font-size: 18px;
@@ -136,7 +135,7 @@ body.offline .offline-badge { display: inline-flex; }
 .project-button {
   display: inline-flex;
   flex: 0 1 auto;
-  min-width: 0;                                  /* a long name shrinks to "…" instead of pushing the counts off */
+  min-width: 0;                                  /* a long name shrinks to "…" instead of pushing the person off */
   align-items: center;
   gap: 8px;
   margin: -4px 0 -4px -6px;                      /* the emoji lines up with the content below; the padding is tap room */
@@ -339,6 +338,32 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .advance.done svg.icon { width: 15px; height: 15px; stroke-width: 2.6; }
 
 .item-body { flex: 1; min-width: 0; }
+
+/* the grip on Todo items: drag it to put the item somewhere else (js/tracker/reorder.js) */
+.grip {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  align-self: center;
+  width: 26px;
+  height: 30px;
+  margin: -6px -6px -6px 0;
+  color: var(--faint);
+  cursor: grab;
+  touch-action: none;                            /* the finger drags the item, not the page */
+}
+.grip::after { content: ""; position: absolute; inset: -6px -8px; }   /* bigger to hit than it looks */
+.grip svg.icon { width: 18px; height: 18px; stroke-width: 3.2; }
+.item.dragging {
+  position: relative;
+  z-index: 5;
+  background: var(--surface-2);
+  box-shadow: 0 14px 30px -10px rgb(0 0 0 / 0.85);
+  cursor: grabbing;
+}
+.item.dragging .grip { color: var(--muted); cursor: grabbing; }
+body.reordering { -webkit-user-select: none; user-select: none; cursor: grabbing; }
 .item-text { margin: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
 .column[data-status="done"] .item-text { color: var(--muted); }
 
@@ -382,7 +407,84 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .backlog-list .item-text { color: var(--muted); }
 .advance.parked svg.icon { width: 17px; height: 17px; }
 
-/* "Move to backlog" in an item (js/tracker/item-sheet.js): a plain grey link under its status */
+/* a test's two answers (js/tracker/item-sheet.js): Passed (to Done) and Didn't pass (back to Todo, with why) */
+.test-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.answer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-weight: 700;
+  transition: background 160ms, transform 120ms var(--ease);
+}
+.answer svg.icon { width: 17px; height: 17px; stroke-width: 2.4; }
+.answer:active { transform: scale(0.97); }
+.answer.passed { border-color: rgb(52 211 153 / 0.4); background: rgb(52 211 153 / 0.12); color: var(--done); }
+.answer.failed { border-color: rgb(248 113 113 / 0.4); background: rgb(248 113 113 / 0.12); color: var(--danger); }
+/* pressed: solid red, with the note box open under it */
+.answer.failed.open {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #2a0d0d;
+  box-shadow: 0 6px 18px -6px rgb(248 113 113 / 0.7);
+}
+.fail-box .item-note-input { border-color: rgb(248 113 113 / 0.45); }
+
+/* a test's sheet: nothing to edit or move elsewhere, just its notes to read and the two answers */
+.item-sheet.testing :is(#itemStatus, #itemBacklog, #itemKind, #itemNote, .item-actions) { display: none; }
+/* a done item: no kind or backlog, and its notes just to read */
+.item-sheet.finished :is(#itemBacklog, #itemKind, #itemNote) { display: none; }
+
+/* the file to print (3D printing projects): the link, and Copy */
+.link-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.link-field input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-size: 13px;
+}
+.link-field input::placeholder { color: var(--faint); }
+.link-field input:read-only { color: var(--muted); }
+.link-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.link-copy svg.icon { width: 15px; height: 15px; }
+.link-copy:active { transform: scale(0.95); }
+.item-sheet.testing .item-text-input { pointer-events: none; }
+.item-note-view {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* "Move to backlog" under an item's status, in grey */
 .backlog-move {
   display: inline-flex;
   align-items: center;
@@ -395,13 +497,16 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
   font-weight: 600;
 }
 .backlog-move svg.icon { width: 15px; height: 15px; }
+/* what went wrong, then back to Todo */
+.fail-box { display: flex; flex-direction: column; gap: 8px; }
+.fail-box .pill { align-self: flex-end; }
 
 /* ----- the round + at the bottom right: opens the add sheet ----- */
 
 .fab {
   position: fixed;
   right: max(16px, calc((100% - 1240px) / 2 + 16px));
-  bottom: calc(18px + var(--safe-bottom));
+  bottom: calc(18px + var(--safe-bottom) - var(--viewport-gap));
   z-index: 10;
   display: grid;
   place-items: center;
@@ -422,6 +527,7 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .add-sheet .sheet-title span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .add-row { display: flex; gap: 8px; }
 .add-row .text-input { flex: 1; min-width: 0; }
+.add-link { font-size: 13px; }                     /* 3D printing projects: the file to print */
 .add-send {
   display: grid;
   place-items: center;
@@ -621,6 +727,13 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 }
 .hue.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px hsl(var(--hue) 80% 68%); }
 .hue:active { transform: scale(0.9); }
+
+/* the kind of project, in the project sheet: GitHub (code, with its repo) or 3D printing; small, on the left */
+.project-type { align-self: flex-start; font-size: 13px; }
+.project-type > button { gap: 6px; padding: 6px 14px; }
+.project-type svg.icon { width: 14px; height: 14px; }
+/* a 3D printing project has no GitHub repo (js/tracker/project-sheet.js) */
+.printing :is(label[for="projectUrl"], .repo-field) { display: none; }
 
 /* type-the-name confirmation (js/ui/confirm.js) */
 .confirm-text { margin: 0; line-height: 1.45; }

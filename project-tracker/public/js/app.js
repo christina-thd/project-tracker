@@ -13,6 +13,7 @@ import { createItemSheet } from './tracker/item-sheet.js';
 import { createPersonSheet } from './tracker/person-sheet.js';
 import { createProjectList } from './tracker/project-list.js';
 import { createProjectSheet } from './tracker/project-sheet.js';
+import { wireReorder } from './tracker/reorder.js';
 import { createSwitcher, renderProjectButton } from './tracker/switcher.js';
 import { goBack, pushBack } from './ui/back.js';
 import { addStatusIcons, icon } from './ui/icons.js';
@@ -214,6 +215,10 @@ function render() {
   renderProjectButton(project);
   if (!project) return;
   if (clearArmed && !items.some((i) => i.projectId === current && i.status === 'done')) disarmClear();
+  // the lists' names on the tabs, columns and pickers, in this project's words (3D printing: To print, Printed)
+  for (const name of document.querySelectorAll('[data-status-name]')) {
+    if (name instanceof HTMLElement) name.textContent = statusLabel(name.dataset.statusName, project);
+  }
   renderBoard({ project, items, tab });
   $('addButton').style.setProperty('--hue', String(project.hue));   // the + takes the project's color
 }
@@ -228,22 +233,24 @@ function advance(itemId) {
   const next = item && nextStatus(item.status);
   if (!next) return;
   const back = item.status;
+  const project = getProject();
   sendAction({ type: 'setStatus', itemId, status: next })
-    .then(() => toast(next === 'done' ? 'Done' : `Moved to ${statusLabel(next)}`, {
+    .then(() => toast(next === 'done' ? statusLabel('done', project) : `Moved to ${statusLabel(next, project)}`, {
       icon: next === 'done' ? 'check' : 'flask',
       action: { label: 'Undo', run: () => sendAction({ type: 'setStatus', itemId, status: back }).catch(toastError) },
     }))
     .catch(toastError);
 }
 
-/** After deleting an item: Undo adds it back (as a new item, with the same text, notes and status). */
+/** After deleting an item: Undo adds it back (as a new item, with the same text, notes, link and status). */
 function offerRestore(item) {
   toast('Deleted', {
     icon: 'trash',
     action: {
       label: 'Undo',
-      run: () => sendAction({ type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, status: item.status, kind: item.kind })
-        .catch(toastError),
+      run: () => sendAction({
+        type: 'addItem', projectId: item.projectId, text: item.text, note: item.note, link: item.link, status: item.status, kind: item.kind,
+      }).catch(toastError),
     },
   });
 }
@@ -285,6 +292,16 @@ wireBoard({
   onAdvance: advance,
   onOpen: (id) => itemSheet.open(id),
   onClearDone: tapClear,
+});
+
+// Dragging Todo items into another order: the new order comes back with the next update; a failed move, or one
+// let go where it started, just draws the list again (it may have missed updates while dragging)
+wireReorder(/** @type {HTMLElement} */ ($('board').querySelector('.column[data-status="todo"] .list')), {
+  onMove: (itemId, beforeId) => sendAction({ type: 'reorderItem', itemId, beforeId }).catch((err) => {
+    toastError(err);
+    render();
+  }),
+  onCancel: render,
 });
 
 // On a PC: Escape closes the open sheet (like the back button); "n" or "+" opens the add sheet

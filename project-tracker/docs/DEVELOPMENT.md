@@ -56,7 +56,8 @@ public/                   browser (plain ES modules, no build step)
   js/tracker/             kind-picker (bug / feature / other, by emoji), home (who's this? a tile per person), person-sheet (new / edit person),
                           board (the three columns, and the backlog under Todo), clear-done (clearing done items, with Undo), project-list (a person's projects, with search: the projects
                           screen and the switcher use it), switcher (header project button + the project list sheet),
-                          add-sheet (the + button's sheet), item-sheet (one item), project-sheet (new / edit project)
+                          add-sheet (the + button's sheet), item-sheet (one item; tests and done items get a simpler
+                          view), project-sheet (new / edit project), reorder (dragging Todo items by their grip)
 
 test/                     node:test suites
 ```
@@ -70,11 +71,19 @@ only render the latest view.
 
 **Actions:** `addPerson`, `renamePerson`, `setPersonEmoji`, `removePerson` (with their projects), `addProject`
 (for a person), `renameProject`, `setProjectEmoji`, `setProjectHue`, `setProjectUrl` (its repo link: any web address, `cleanUrl`; the
-project sheet takes a GitHub repo, `githubUrl` / `githubRepo` in `public/js/shared/tracker.js`), `removeProject` (with its items), `addItem`,
-`editItem`, `setStatus`, `removeItem`, `clearDone`. See `src/tracker/actions.js`. Statuses are `todo`, `test` and
-`done` (`STATUSES` in `public/js/shared/tracker.js`), plus `backlog` (`ITEM_STATUS_IDS`): out of the three lists,
-not open (`isOpen`), shown dimmed under Todo; `movedAt` records when an item got its status, and lists show
-the latest first.
+project sheet takes a GitHub repo, `githubUrl` / `githubRepo` in `public/js/shared/tracker.js`), `setProjectPrint`,
+`removeProject` (with its items), `addItem`, `editItem`, `setStatus`, `reorderItem`, `removeItem`, `clearDone`. See
+`src/tracker/actions.js`. Statuses are `todo`, `test` and `done` (`STATUSES` in `public/js/shared/tracker.js`), plus
+`backlog` (`ITEM_STATUS_IDS`): out of the three lists, not open (`isOpen`), shown dimmed under Todo; `movedAt`
+records when an item got its status.
+
+**Order.** Each item has a `rank`, and lists show the lowest first. New and just-moved items get `-now`, so they go
+on top; `reorderItem` puts an item before another one in its list and numbers the list again from its first rank.
+Items saved before ranks get `-movedAt`, the newest-first order they had.
+
+**3D printing projects** (`project.print`) name their lists Todo, To print and Printed (`statusLabel(status,
+project)`; the page puts them on every `[data-status-name]`), and their items have a `link` to the file to print
+(any text: a web address or a path).
 
 **People.** Everyone has their own projects (`project.personId`); project names are unique per person. There are
 no passwords: the home screen lets anyone pick anyone, and the device remembers who. Schema 1 (before people) is

@@ -1,6 +1,6 @@
 // A person's projects, most recently active first: used by the projects screen and the switching sheet.
 import { closest, escapeHtml } from '../shared/dom.js';
-import { githubRepo, shortUrl } from '../shared/tracker.js';
+import { githubRepo, shortUrl, statusLabel } from '../shared/tracker.js';
 import { icon } from '../ui/icons.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
@@ -16,10 +16,11 @@ function rowHtml(p, items, selected) {
   const mine = items.filter((i) => i.projectId === p.id);
   const todo = mine.filter((i) => i.status === 'todo').length;
   const test = mine.filter((i) => i.status === 'test').length;
+  const testName = statusLabel('test', p).toLowerCase();   // "test", or "to print" in a 3D printing project
   const counts = todo || test
-    ? `${todo ? `<span class="count-todo">${todo} todo</span>` : ''}${test ? `<span class="count-test">${test} test</span>` : ''}`
+    ? `${todo ? `<span class="count-todo">${todo} todo</span>` : ''}${test ? `<span class="count-test">${test} ${testName}</span>` : ''}`
     : '<span>Nothing open</span>';
-  const repo = p.url
+  const repo = p.url && !p.print                   // 3D printing projects show no repo
     ? `<a class="switch-repo" href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer"
         aria-label="Open the repo of ${escapeHtml(p.name)}" title="${escapeHtml(shortUrl(p.url))}">${icon(githubRepo(p.url) ? 'github' : 'code')}</a>`
     : '';

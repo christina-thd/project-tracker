@@ -13,7 +13,8 @@ import { toastError } from '../ui/toast.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
 
-const PLACEHOLDER = { todo: 'What needs doing?', test: 'What needs testing?' };
+const PLACEHOLDER = { todo: 'Next thing to do…', test: 'Next thing to test…' };
+const PRINT_PLACEHOLDER = { todo: 'Next thing to do…', test: 'Next thing to print…' };
 
 /**
  * @param {{ getProjects(): Project[], onAdded(status: string): void }} options
@@ -21,6 +22,7 @@ const PLACEHOLDER = { todo: 'What needs doing?', test: 'What needs testing?' };
 export function createAddSheet({ getProjects, onAdded }) {
   const input = /** @type {HTMLInputElement} */ ($('addText'));
   const note = /** @type {HTMLTextAreaElement} */ ($('addNote'));
+  const link = /** @type {HTMLInputElement} */ ($('addLink'));   // 3D printing projects: the file to print
   const noteToggle = $('addNoteToggle');
   let projectId = null;                            // the project it was opened for: always adds there
   let status = 'todo';
@@ -53,7 +55,8 @@ export function createAddSheet({ getProjects, onAdded }) {
       button.classList.toggle('selected', selected);
       button.setAttribute('aria-checked', String(selected));
     }
-    input.placeholder = PLACEHOLDER[status];
+    input.placeholder = project?.print ? PRINT_PLACEHOLDER[status] : PLACEHOLDER[status];
+    link.hidden = !project?.print;
     if (!$('addSend').classList.contains('added')) $('addSend').innerHTML = icon('plus');
   }
 
@@ -90,8 +93,11 @@ export function createAddSheet({ getProjects, onAdded }) {
     if (!text || sending || !project) return input.focus();
     sending = true;
     try {
-      await sendAction({ type: 'addItem', projectId: project.id, text, note: note.value, status, kind: kind.value });
+      await sendAction({
+        type: 'addItem', projectId: project.id, text, note: note.value, link: project.print ? link.value : '', status, kind: kind.value,
+      });
       input.value = '';
+      link.value = '';
       showNote(false);
       note.style.height = '';
       showAdded(text);
@@ -107,7 +113,7 @@ export function createAddSheet({ getProjects, onAdded }) {
   /** It's in: said under the field (green, with a little pop, for a few seconds) and with a ✓ on the + for a moment. */
   function showAdded(text) {
     const hint = $('addHint');
-    hint.innerHTML = `${icon('check')}<span>Added "${escapeHtml(text)}" to ${statusLabel(status)}</span>`;
+    hint.innerHTML = `${icon('check')}<span>Added "${escapeHtml(text)}" to ${statusLabel(status, getProject())}</span>`;
     hint.classList.remove('added');
     void hint.offsetWidth;                         // restart the pop for each one
     hint.classList.add('added');
@@ -130,6 +136,7 @@ export function createAddSheet({ getProjects, onAdded }) {
       status = startStatus === 'test' ? 'test' : 'todo';
       kind.set(storage.get('tracker.kind'));
       input.value = '';
+      link.value = '';
       showNote(false);
       showHint();
       render();

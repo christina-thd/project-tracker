@@ -5,13 +5,16 @@
  * @typedef {{ id: string, name: string, emoji: string, createdAt: number }} Person
  *   someone in the house: each person has their own projects (picked on the home screen; no passwords)
  * @typedef {{ id: string, personId: string, name: string, emoji: string, hue: number, url: string | null,
- *   createdAt: number }} Project
+ *   print: boolean, createdAt: number }} Project
  *   emoji: what marks the project (header, project list); hue: its color (item stripe, the + button);
- *   url: its repository (e.g. on GitHub), opened from the header; null when it has none
+ *   url: its repository (e.g. on GitHub), opened from the header; null when it has none;
+ *   print: a 3D printing project (lists named for printing, a link to the file on every item)
  * @typedef {'bug' | 'feature' | 'other'} Kind
- * @typedef {{ id: string, projectId: string, text: string, note: string, status: Status, kind: Kind,
- *   createdAt: number, movedAt: number }} Item
- *   movedAt: when it got its current status (lists show the latest first)
+ * @typedef {{ id: string, projectId: string, text: string, note: string, link: string, status: Status, kind: Kind,
+ *   createdAt: number, movedAt: number, rank: number }} Item
+ *   link: the file to print (3D printing projects), a web address or a path; '' for none;
+ *   movedAt: when it got its current status; rank: its place in its list, lowest first (-movedAt until it's dragged
+ *   somewhere else, so new and just-moved items come first)
  */
 
 /** The way every item goes: todo → test (built, waiting to be tried) → done. A failed test sends it back to todo. */
@@ -30,8 +33,18 @@ export const ITEM_STATUS_IDS = Object.freeze([...STATUS_IDS, BACKLOG]);
 /** Still to do or to test (not done, not in the backlog). */
 export const isOpen = (status) => status === 'todo' || status === 'test';
 
-/** @param {string} status */
-export const statusLabel = (status) => (status === BACKLOG ? 'Backlog' : STATUSES.find((s) => s.id === status)?.label ?? status);
+/** A 3D printing project's lists: what's still to get ready, what's ready to print, and what's printed. */
+const PRINT_LABELS = Object.freeze({ todo: 'Todo', test: 'To print', done: 'Printed' });
+
+/**
+ * A status's name, in the words of the project it's in (a 3D printing project's are different).
+ * @param {string} status
+ * @param {{ print?: boolean } | null} [project]
+ */
+export function statusLabel(status, project = null) {
+  if (status === BACKLOG) return 'Backlog';
+  return (project?.print && PRINT_LABELS[status]) || (STATUSES.find((s) => s.id === status)?.label ?? status);
+}
 
 /** Where the round button on an item takes it; null once done. */
 export function nextStatus(status) {

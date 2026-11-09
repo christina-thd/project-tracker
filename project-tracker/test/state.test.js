@@ -15,13 +15,22 @@ test('a saved tracker comes back as it was', () => {
   const saved = {
     schema: SCHEMA_VERSION,
     people: [{ id: 'ab', name: 'Chris', emoji: '🦊', createdAt: NOW - 20 }],
-    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', createdAt: NOW - 10 }],
+    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', print: true, createdAt: NOW - 10 }],
     items: [
-      { id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1 },
-      { id: 'cd', projectId: 'aa', text: 'Later', note: '', status: 'backlog', kind: 'other', createdAt: NOW - 5, movedAt: NOW - 2 },
+      { id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', link: 'https://example.com/a.stl', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1, rank: 3 },
+      { id: 'cd', projectId: 'aa', text: 'Later', note: '', link: '', status: 'backlog', kind: 'other', createdAt: NOW - 5, movedAt: NOW - 2, rank: -(NOW - 2) },
     ],
   };
   assert.deepEqual(normalizeState(structuredClone(saved), NOW), saved);
+});
+
+test('items saved before reordering keep their order: newest move first', () => {
+  const state = normalizeState({
+    people: [{ id: 'a1', name: 'Chris' }],
+    projects: [{ id: 'aa', personId: 'a1', name: 'Website' }],
+    items: [{ id: 'b1', projectId: 'aa', text: 'Old', movedAt: NOW - 9 }, { id: 'b2', projectId: 'aa', text: 'New', movedAt: NOW - 1 }],
+  }, NOW);
+  assert.deepEqual([...state.items].sort((a, b) => a.rank - b.rank).map((i) => i.text), ['New', 'Old']);
 });
 
 test('projects saved before there were people go to a first person, "Me"', () => {

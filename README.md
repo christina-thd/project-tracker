@@ -3,10 +3,10 @@
 A to-do and ready-to-test tracker for every project you're working on, as a Home Assistant add-on.
 
 <p>
-  <img src="images/home.jpg" alt="The home screen: pick yourself to see your projects" width="200">
   <img src="images/projects.jpg" alt="Your projects, with what's open in each: pick one to work on" width="200">
   <img src="images/todo.jpg" alt="A project's Todo list, with the backlog dimmed under it" width="200">
   <img src="images/add.jpg" alt="Adding an item, with a note: the sheet stays open for the next one" width="200">
+  <img src="images/print.jpg" alt="A 3D printing project's item waiting to print: its file to copy, and Printed or Print failed" width="200">
 </p>
 <p>
   <img src="images/desktop.jpg" alt="On a PC: Todo, Test and Done side by side" width="820">
@@ -29,9 +29,10 @@ Keep track of what's to do and what's ready to test, per project.
 
 **Features:**
 - Everyone has their own projects, each with an emoji and a link to its GitHub repo
-- **Todo**, **Test** and **Done** lists, and a backlog for later; one tap moves an item along
+- **Todo**, **Test** and **Done** lists, and a backlog for later; one tap moves an item along, a drag reorders
 - Quick add: tap +, type, and the next one
 - Notes and 🐞 bug / ✨ feature / 📝 other on any item
+- 3D printing projects: **To print** and **Printed**, with a link to each file
 - Phone and PC, live on every screen
 
 [Documentation →](./project-tracker/README.md)
