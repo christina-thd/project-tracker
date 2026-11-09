@@ -30,7 +30,7 @@ let firstRender = true;
 
 /**
  * @param {Project} project
- * @param {boolean} [grip] with a grip to drag it into another place (Todo, with two items or more)
+ * @param {boolean} [grip] with a grip to drag it into another place (Todo and Test, with two items or more)
  */
 function itemHtml(item, project, now, grip = false) {
   const hue = project.hue;
@@ -63,8 +63,9 @@ export function renderBoard({ project, items, tab }) {
   for (const status of STATUS_IDS) {
     const list = mine.filter((i) => i.status === status).sort(byRank);
     const column = /** @type {HTMLElement} */ ($('board').querySelector(`.column[data-status="${status}"]`));
-    const grips = status === 'todo' && list.length > 1;
-    if (!(status === 'todo' && isDragging())) {     // not under the item being dragged: once it's let go
+    const sortable = status === 'todo' || status === 'test';   // Todo and Test (To print) can be put in any order
+    const grips = sortable && list.length > 1;
+    if (!(sortable && isDragging())) {             // not under the item being dragged: once it's let go
       column.querySelector('.list').innerHTML = list.map((i) => itemHtml(i, project, now, grips)).join('');
     }
     column.querySelector('.count').textContent = list.length ? String(list.length) : '';
