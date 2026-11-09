@@ -83,7 +83,8 @@ Items saved before ranks get `-movedAt`, the newest-first order they had.
 
 **3D printing projects** (`project.print`) name their lists Todo, To print and Printed (`statusLabel(status,
 project)`; the page puts them on every `[data-status-name]`), and their items have a `link` to the file to print
-(any text: a web address or a path).
+(any text: a web address or a path). They show no kind (bug / feature / other): new items get `other`, and an item's
+kind is kept, just not shown, in case the project goes back to GitHub.
 
 **People.** Everyone has their own projects (`project.personId`); project names are unique per person. There are
 no passwords: the home screen lets anyone pick anyone, and the device remembers who. Schema 1 (before people) is

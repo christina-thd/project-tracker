@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.1
+- No bug, feature or other on 3D printing projects
+
 ## 2.2.0
 - Drag Todo items into any order
 - A test that didn't pass goes back to Todo with what went wrong
