@@ -13,6 +13,7 @@ import { createItemSheet } from './tracker/item-sheet.js';
 import { createPersonSheet } from './tracker/person-sheet.js';
 import { createProjectList } from './tracker/project-list.js';
 import { createProjectSheet } from './tracker/project-sheet.js';
+import { wireReorder } from './tracker/reorder.js';
 import { createSwitcher, renderProjectButton } from './tracker/switcher.js';
 import { goBack, pushBack } from './ui/back.js';
 import { addStatusIcons, icon } from './ui/icons.js';
@@ -285,6 +286,16 @@ wireBoard({
   onAdvance: advance,
   onOpen: (id) => itemSheet.open(id),
   onClearDone: tapClear,
+});
+
+// Dragging Todo items into another order: the new order comes back with the next update; a failed move, or one
+// let go where it started, just draws the list again (it may have missed updates while dragging)
+wireReorder(/** @type {HTMLElement} */ ($('board').querySelector('.column[data-status="todo"] .list')), {
+  onMove: (itemId, beforeId) => sendAction({ type: 'reorderItem', itemId, beforeId }).catch((err) => {
+    toastError(err);
+    render();
+  }),
+  onCancel: render,
 });
 
 // On a PC: Escape closes the open sheet (like the back button); "n" or "+" opens the add sheet

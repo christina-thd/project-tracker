@@ -28,7 +28,6 @@
   gap: 4px 6px;
 }
 .top h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.top-summary { margin: 0 0 0 auto; color: var(--muted); font-size: 12px; }
 /* the live connection has been down a few seconds (js/app.js): changes from other screens won't show until it's back */
 .offline-badge {
   display: none;
@@ -107,7 +106,7 @@ body.offline .offline-badge { display: inline-flex; }
   flex: none;
   width: 32px;
   height: 32px;
-  margin-left: 4px;
+  margin-left: auto;                             /* pushed to the right end */
   border-radius: 50%;
   background: var(--surface-3);
   font-size: 18px;
@@ -136,7 +135,7 @@ body.offline .offline-badge { display: inline-flex; }
 .project-button {
   display: inline-flex;
   flex: 0 1 auto;
-  min-width: 0;                                  /* a long name shrinks to "…" instead of pushing the counts off */
+  min-width: 0;                                  /* a long name shrinks to "…" instead of pushing the person off */
   align-items: center;
   gap: 8px;
   margin: -4px 0 -4px -6px;                      /* the emoji lines up with the content below; the padding is tap room */
@@ -339,6 +338,32 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .advance.done svg.icon { width: 15px; height: 15px; stroke-width: 2.6; }
 
 .item-body { flex: 1; min-width: 0; }
+
+/* the grip on Todo items: drag it to put the item somewhere else (js/tracker/reorder.js) */
+.grip {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  align-self: center;
+  width: 26px;
+  height: 30px;
+  margin: -6px -6px -6px 0;
+  color: var(--faint);
+  cursor: grab;
+  touch-action: none;                            /* the finger drags the item, not the page */
+}
+.grip::after { content: ""; position: absolute; inset: -6px -8px; }   /* bigger to hit than it looks */
+.grip svg.icon { width: 18px; height: 18px; stroke-width: 3.2; }
+.item.dragging {
+  position: relative;
+  z-index: 5;
+  background: var(--surface-2);
+  box-shadow: 0 14px 30px -10px rgb(0 0 0 / 0.85);
+  cursor: grabbing;
+}
+.item.dragging .grip { color: var(--muted); cursor: grabbing; }
+body.reordering { -webkit-user-select: none; user-select: none; cursor: grabbing; }
 .item-text { margin: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
 .column[data-status="done"] .item-text { color: var(--muted); }
 
@@ -401,7 +426,7 @@ button.advance:active { transform: scale(0.85); background: var(--surface-3); }
 .fab {
   position: fixed;
   right: max(16px, calc((100% - 1240px) / 2 + 16px));
-  bottom: calc(18px + var(--safe-bottom));
+  bottom: calc(18px + var(--safe-bottom) - var(--viewport-gap));
   z-index: 10;
   display: grid;
   place-items: center;

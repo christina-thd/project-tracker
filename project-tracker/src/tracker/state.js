@@ -70,6 +70,7 @@ function normalizeItem(raw, now, projectIds) {
   const text = cleanText(raw.text, MAX_TEXT);
   if (!text) return null;
   const createdAt = toTime(raw.createdAt, now);
+  const movedAt = toTime(raw.movedAt, createdAt);
   return {
     id: isId(raw.id) ? raw.id : newId(),
     projectId: raw.projectId,
@@ -78,7 +79,8 @@ function normalizeItem(raw, now, projectIds) {
     status: ITEM_STATUS_IDS.includes(raw.status) ? raw.status : 'todo',
     kind: KIND_IDS.includes(raw.kind) ? raw.kind : DEFAULT_KIND,   // from before kinds: other
     createdAt,
-    movedAt: toTime(raw.movedAt, createdAt),
+    movedAt,
+    rank: Number.isFinite(raw.rank) ? raw.rank : -movedAt,   // from before reordering: newest move first, as it was
   };
 }
 

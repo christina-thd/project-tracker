@@ -36,6 +36,7 @@
   /* the part of the screen you can see (smaller while the keyboard is open), kept up to date by js/ui/viewport.js */
   --viewport-top: 0px;
   --viewport-height: 100dvh;
+  --viewport-gap: 0px;                           /* how much the page is measured short of the screen (iPhone home screen) */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 

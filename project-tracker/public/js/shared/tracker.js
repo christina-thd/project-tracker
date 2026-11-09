@@ -10,8 +10,9 @@
  *   url: its repository (e.g. on GitHub), opened from the header; null when it has none
  * @typedef {'bug' | 'feature' | 'other'} Kind
  * @typedef {{ id: string, projectId: string, text: string, note: string, status: Status, kind: Kind,
- *   createdAt: number, movedAt: number }} Item
- *   movedAt: when it got its current status (lists show the latest first)
+ *   createdAt: number, movedAt: number, rank: number }} Item
+ *   movedAt: when it got its current status; rank: its place in its list, lowest first (-movedAt until it's dragged
+ *   somewhere else, so new and just-moved items come first)
  */
 
 /** The way every item goes: todo → test (built, waiting to be tried) → done. A failed test sends it back to todo. */

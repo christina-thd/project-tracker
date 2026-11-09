@@ -13,7 +13,7 @@ import { toastError } from '../ui/toast.js';
 
 /** @typedef {import('../shared/tracker.js').Project} Project */
 
-const PLACEHOLDER = { todo: 'What needs doing?', test: 'What needs testing?' };
+const PLACEHOLDER = { todo: 'A bug, a feature, an idea…', test: 'What did you build?' };
 
 /**
  * @param {{ getProjects(): Project[], onAdded(status: string): void }} options

@@ -164,6 +164,7 @@ const handlers = {
       kind: oneOf(kind ?? DEFAULT_KIND, KIND_IDS, 'kind'),
       createdAt: now,
       movedAt: now,
+      rank: -now,                                  // on top of its list
     };
     state.items.push(item);
     return { itemId: item.id };
@@ -190,6 +191,22 @@ const handlers = {
     if (item.status === status) return;
     item.status = status;
     item.movedAt = now;
+    item.rank = -now;                              // on top of the list it moved to
+  },
+
+  /**
+   * Puts an item right before another one in the same list (same project and status), or last when `beforeId` is
+   * null. The list is numbered again from its first item's rank, so it keeps its place under newer items.
+   */
+  reorderItem(state, { itemId, beforeId = null }) {
+    const item = getItem(state, itemId);
+    const list = state.items.filter((i) => i.projectId === item.projectId && i.status === item.status && i !== item)
+      .sort((a, b) => a.rank - b.rank);
+    const index = beforeId === null ? list.length : list.findIndex((i) => i.id === beforeId);
+    if (index < 0) throw new ActionError('beforeId must be another item in the same list');
+    const base = Math.min(item.rank, list[0]?.rank ?? item.rank);
+    list.splice(index, 0, item);
+    list.forEach((i, n) => { i.rank = base + n; });
   },
 
   removeItem(state, { itemId }) {
