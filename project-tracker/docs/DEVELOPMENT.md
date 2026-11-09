@@ -57,7 +57,7 @@ public/                   browser (plain ES modules, no build step)
                           board (the three columns, and the backlog under Todo), clear-done (clearing done items, with Undo), project-list (a person's projects, with search: the projects
                           screen and the switcher use it), switcher (header project button + the project list sheet),
                           add-sheet (the + button's sheet), item-sheet (one item; tests and done items get a simpler
-                          view), project-sheet (new / edit project), reorder (dragging Todo items by their grip)
+                          view), project-sheet (new / edit project), reorder (dragging Todo and Test items by their grip)
 
 test/                     node:test suites
 ```

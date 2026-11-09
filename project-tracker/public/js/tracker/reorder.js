@@ -1,4 +1,4 @@
-// Putting Todo items in another order: drag one by its grip (the dots on its right). It follows the finger or mouse,
+// Putting Todo and Test items in another order: drag one by its grip (the dots on its right). It follows the finger or mouse,
 // the others make room, the page scrolls near the edges, and the new place is sent once it's let go.
 
 let drag = null;
@@ -13,7 +13,7 @@ const middle = (el) => {
 };
 
 /**
- * @param {HTMLElement} list  the Todo list
+ * @param {HTMLElement} list  the Todo or the Test list
  * @param {{ onMove(itemId: string, beforeId: string | null): void, onCancel(): void }} handlers
  *   onMove: it was let go somewhere else (before `beforeId`, or last); onCancel: it went back where it was
  */

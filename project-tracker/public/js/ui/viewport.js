@@ -9,22 +9,20 @@ export function trackVisibleViewport() {
   const root = document.documentElement.style;
   const standalone = Boolean(/** @type {any} */ (navigator).standalone);
 
-  // Opened from an iPhone home-screen icon, the page can be measured shorter than the screen (by about the status
-  // bar), leaving the + and messages that much too high. The part missing at the bottom is added back
-  // (--viewport-gap); 0 everywhere else.
+  // Opened from an iPhone home-screen icon, the page can end short of the screen's bottom (by about the status bar),
+  // and nothing shows below that. Then the home bar isn't over the page, so the room kept for it isn't needed:
+  // --viewport-gap is how short the page is, and css/base.css takes it off --safe-bottom. 0 everywhere else.
   function missing() {
     if (!standalone) return 0;
     const screenHeight = innerWidth > innerHeight ? screen.width : screen.height;
     const gap = screenHeight - innerHeight;
-    return gap > 0 && gap <= 120 ? gap : 0;
+    return gap > 0 && gap <= 160 ? gap : 0;
   }
 
   function update() {
-    const keyboard = viewport.height < innerHeight - 100;   // the keyboard is open: its top is the bottom
-    const gap = keyboard ? 0 : missing();
     root.setProperty('--viewport-top', `${viewport.offsetTop}px`);
-    root.setProperty('--viewport-height', `${viewport.height + gap}px`);
-    root.setProperty('--viewport-gap', `${gap}px`);
+    root.setProperty('--viewport-height', `${viewport.height}px`);
+    root.setProperty('--viewport-gap', `${missing()}px`);
   }
 
   viewport.addEventListener('resize', update);
@@ -33,8 +31,7 @@ export function trackVisibleViewport() {
   update();
 
   // Opened from an iPhone home-screen icon, the screen is measured a little short until the page first scrolls
-  // (a WebKit quirk): a 1px scroll and back, once it has drawn, makes it measure again, as a scroll would. That
-  // can't work when the page is too short to scroll: then the gap above covers it.
+  // (a WebKit quirk): a 1px scroll and back, once it has drawn, makes it measure again, as a scroll would.
   if (standalone) {
     const settle = () => {
       const { scrollY } = window;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2
+- Fix: bottom of the screen cut off on iPhone
+- Add custom ordering on tests
+
 ## 2.2.1
 - No bug, feature or other on 3D printing projects
 

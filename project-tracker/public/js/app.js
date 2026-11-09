@@ -294,15 +294,17 @@ wireBoard({
   onClearDone: tapClear,
 });
 
-// Dragging Todo items into another order: the new order comes back with the next update; a failed move, or one
-// let go where it started, just draws the list again (it may have missed updates while dragging)
-wireReorder(/** @type {HTMLElement} */ ($('board').querySelector('.column[data-status="todo"] .list')), {
-  onMove: (itemId, beforeId) => sendAction({ type: 'reorderItem', itemId, beforeId }).catch((err) => {
-    toastError(err);
-    render();
-  }),
-  onCancel: render,
-});
+// Dragging Todo and Test (To print) items into another order: the new order comes back with the next update; a
+// failed move, or one let go where it started, just draws the list again (it may have missed updates while dragging)
+for (const status of ['todo', 'test']) {
+  wireReorder(/** @type {HTMLElement} */ ($('board').querySelector(`.column[data-status="${status}"] .list`)), {
+    onMove: (itemId, beforeId) => sendAction({ type: 'reorderItem', itemId, beforeId }).catch((err) => {
+      toastError(err);
+      render();
+    }),
+    onCancel: render,
+  });
+}
 
 // On a PC: Escape closes the open sheet (like the back button); "n" or "+" opens the add sheet
 document.addEventListener('keydown', (e) => {

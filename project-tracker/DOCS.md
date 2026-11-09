@@ -39,8 +39,8 @@ a project or a person shows one too, with **Undo** to put it back as it was.
 Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list,
 then tap **Save**. **Close** leaves without saving. **Delete** removes it.
 
-Drag a Todo item by the dots on its right to put it in another order: the order is kept, on every screen. New items,
-and items moved back to Todo, go on top.
+Drag a Todo or Test item by the dots on its right to put it in another order: the order is kept, on every screen. New
+items, and items moved into a list, go on top.
 
 ### Testing
 
