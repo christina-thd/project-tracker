@@ -2,6 +2,7 @@
 
 ## 2.2.0
 - Drag Todo items into any order
+- A test that didn't pass goes back to Todo with what went wrong
 - Fix: + button and toasts too high on iPhone
 
 ## 2.1.0

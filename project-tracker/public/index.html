@@ -138,6 +138,18 @@
       </div>
       <div class="sheet-body">
         <textarea class="item-text-input" id="itemText" rows="1" maxlength="300" aria-label="What"></textarea>
+        <!-- a test only gets its two answers, with its notes to read (js/tracker/item-sheet.js) -->
+        <p class="item-note-view" id="itemNoteView" hidden></p>
+        <div class="test-answers" id="itemAnswers" hidden>
+          <button type="button" class="answer passed" id="itemPassed"></button>
+          <button type="button" class="answer failed" id="itemFail"></button>
+        </div>
+        <!-- a test that didn't pass: what went wrong goes into the notes, and the item back to Todo -->
+        <div class="fail-box" id="itemFailBox" hidden>
+          <textarea class="item-note-input" id="itemFailText" rows="2" maxlength="1000"
+            placeholder="Add a note" aria-label="Why it didn't pass"></textarea>
+          <button type="button" class="pill primary" id="itemFailSend"></button>
+        </div>
         <div class="segmented" id="itemStatus" role="radiogroup" aria-label="Status">
           <button type="button" role="radio" data-status="todo">Todo</button>
           <button type="button" role="radio" data-status="test">Test</button>

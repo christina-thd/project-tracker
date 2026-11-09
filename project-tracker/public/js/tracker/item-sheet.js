@@ -121,6 +121,33 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
     save();
   });
 
+  // A test has two answers. Passed: to Done right away. Didn't pass: a box for what went wrong; "Move to Todo" adds
+  // that to the notes (dated) and sends it back. Either way with whatever else was changed.
+  const failBox = $('itemFailBox');
+  const failText = /** @type {HTMLTextAreaElement} */ ($('itemFailText'));
+  function showFail(open) {
+    failBox.hidden = !open;
+    $('itemFail').classList.toggle('open', open);
+    if (open) failText.focus();
+  }
+  $('itemFail').addEventListener('click', () => showFail(failBox.hidden));
+  $('itemPassed').addEventListener('click', () => {
+    if (!itemId) return;
+    status = 'done';
+    save();
+  });
+  failText.addEventListener('input', () => fit(failText));
+  $('itemFailSend').addEventListener('click', () => {
+    if (!itemId) return;
+    const details = failText.value.trim();
+    if (details) {
+      const day = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      note.value = [note.value.trim(), `Didn't pass (${day}): ${details}`].filter(Boolean).join('\n\n');
+    }
+    status = 'todo';
+    save();
+  });
+
   text.addEventListener('input', () => fit(text));
   note.addEventListener('input', () => fit(note));
   // Enter in the title finishes it (it's one line, however long)
@@ -160,6 +187,18 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       renderStatus();
       render(item);
       $('itemSave').innerHTML = `${icon('check')}<span>Save</span>`;
+      // a test: just its answers, and its notes to read (no editing, no Save or Delete: css/tracker.css .testing)
+      const testing = item.status === 'test';
+      $('itemLayer').querySelector('.item-sheet').classList.toggle('testing', testing);
+      text.readOnly = testing;
+      $('itemAnswers').hidden = !testing;
+      $('itemNoteView').hidden = !testing || !item.note;
+      $('itemNoteView').textContent = item.note;
+      $('itemPassed').innerHTML = `${icon('check')}<span>Passed</span>`;
+      $('itemFail').innerHTML = `${icon('undo')}<span>Didn't pass</span>`;
+      $('itemFailSend').innerHTML = `${icon('back')}<span>Move to Todo</span>`;
+      failText.value = '';
+      showFail(false);
       $('itemBacklog').innerHTML = item.status === BACKLOG
         ? `${icon(STATUS_ICONS.todo)}<span>Back to Todo</span>`
         : `${icon(STATUS_ICONS.backlog)}<span>Move to backlog</span>`;

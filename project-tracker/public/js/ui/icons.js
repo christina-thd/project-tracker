@@ -8,6 +8,10 @@ const PATHS = {
   flask: '<path d="M9 3h6M10 3v6.5L5.2 17.8A2.2 2.2 0 0 0 7.1 21h9.8a2.2 2.2 0 0 0 1.9-3.2L14 9.5V3"/><path d="M7.5 15h9"/>',
   note: '<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/>',
   dots: '<path d="M6 12h.01M12 12h.01M18 12h.01"/>',
+  // a curved arrow back: a test that didn't pass goes back to Todo
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  // an arrow to the left: sending something back
+  back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
   // six dots: a grip to drag something by
   grip: '<path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/>',
   // a storage box: the backlog
