@@ -46,7 +46,7 @@ function itemHtml(item, project, now, grip = false) {
   const note = item.note ? `<span class="has-note" title="Has notes">${icon('note')}</span>` : '';
   const link = project.print && item.link ? `<span class="has-note" title="Has a link to the file">${icon('link')}</span>` : '';
   // bugs and features show their emoji; "other" shows nothing, to keep the list calm
-  const kind = item.kind !== DEFAULT_KIND ? `<span class="item-kind" title="${kindOf(item.kind).label}">${kindOf(item.kind).emoji}</span>` : '';
+  const kind = item.kind !== DEFAULT_KIND && !project.print ?`<span class="item-kind" title="${kindOf(item.kind).label}">${kindOf(item.kind).emoji}</span>` : '';
   return `<li class="item${arrived ? ' arrived' : ''}" data-item="${item.id}" style="--hue: ${hue}">${button}
     <div class="item-body"><p class="item-text">${escapeHtml(item.text)}</p><div class="item-meta">${kind}${link}${note}<time>${ago(item.movedAt, now)}</time></div></div>${grip
     ? `<button type="button" class="grip" data-grip aria-label="Drag to reorder">${icon('grip')}</button>` : ''}</li>`;

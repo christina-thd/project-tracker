@@ -232,6 +232,7 @@ export function createItemSheet({ getItem, getProjects, onDeleted }) {
       const view = $('itemLayer').querySelector('.item-sheet');
       view.classList.toggle('testing', testing);
       view.classList.toggle('finished', finished);
+      $('itemKind').hidden = print;                // 3D printing projects have no bug / feature / other
       text.readOnly = testing;
       $('itemAnswers').hidden = !testing;
       $('itemNoteView').hidden = !(testing || finished) || !item.note;

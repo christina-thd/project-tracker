@@ -57,6 +57,7 @@ export function createAddSheet({ getProjects, onAdded }) {
     }
     input.placeholder = project?.print ? PRINT_PLACEHOLDER[status] : PLACEHOLDER[status];
     link.hidden = !project?.print;
+    $('addKind').hidden = Boolean(project?.print);   // 3D printing projects have no bug / feature / other
     if (!$('addSend').classList.contains('added')) $('addSend').innerHTML = icon('plus');
   }
 
@@ -94,7 +95,8 @@ export function createAddSheet({ getProjects, onAdded }) {
     sending = true;
     try {
       await sendAction({
-        type: 'addItem', projectId: project.id, text, note: note.value, link: project.print ? link.value : '', status, kind: kind.value,
+        type: 'addItem', projectId: project.id, text, note: note.value, link: project.print ? link.value : '', status,
+        kind: project.print ? 'other' : kind.value,
       });
       input.value = '';
       link.value = '';

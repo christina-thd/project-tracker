@@ -8,7 +8,7 @@ from your phone, and just as usable from a PC.
 - Everyone has their own projects, each with an emoji and a link to its GitHub repo
 - **Todo**, **Test** and **Done** lists, and a backlog for later; one tap moves an item along, a drag reorders
 - Quick add: tap +, type, and the next one
-- Notes and 🐞 bug / ✨ feature / 📝 other on any item
+- Notes on any item, and 🐞 bug / ✨ feature / 📝 other (not in 3D printing projects)
 - 3D printing projects: **To print** and **Printed**, with a link to each file
 - Phone and PC, live on every screen
 

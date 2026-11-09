@@ -93,7 +93,7 @@ to open the repo. Set it at the bottom of the project's sheet, with **GitHub** p
 
 Pick **3D printing** instead of **GitHub** at the bottom of the project's sheet (new projects start on GitHub). Then:
 
-- its lists are **Todo**, **To print** and **Printed**;
+- its lists are **Todo**, **To print** and **Printed**, and its items have no bug / feature / other;
 - every item can have a **link to the file to print** (a web address or a path), added with the item or in its sheet,
   with **Copy** to paste it into your slicer; items with one show 🔗 in the list;
 - an item in To print opens with **Printed** and **Print failed**, like a test (Print failed goes back to Todo with
