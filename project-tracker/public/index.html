@@ -60,15 +60,15 @@
 
         <!-- ===== phones: one status at a time; wide screens show all three columns ===== -->
         <div class="segmented status-tabs" id="statusTabs" role="tablist">
-          <button type="button" role="tab" data-status="todo">Todo <span class="count"></span></button>
-          <button type="button" role="tab" data-status="test">Test <span class="count"></span></button>
-          <button type="button" role="tab" data-status="done">Done <span class="count"></span></button>
+          <button type="button" role="tab" data-status="todo"><span data-status-name="todo">Todo</span> <span class="count"></span></button>
+          <button type="button" role="tab" data-status="test"><span data-status-name="test">Test</span> <span class="count"></span></button>
+          <button type="button" role="tab" data-status="done"><span data-status-name="done">Done</span> <span class="count"></span></button>
         </div>
       </div>
 
       <main class="board" id="board">
         <section class="column" data-status="todo">
-          <h2 class="column-head"><span class="column-label"><span class="column-dot"></span>Todo <span class="count"></span></span></h2>
+          <h2 class="column-head"><span class="column-label"><span class="column-dot"></span><span data-status-name="todo">Todo</span> <span class="count"></span></span></h2>
           <ul class="list"></ul>
           <p class="empty"></p>
           <div class="backlog" id="backlog" hidden>
@@ -79,13 +79,13 @@
           </div>
         </section>
         <section class="column" data-status="test">
-          <h2 class="column-head"><span class="column-label"><span class="column-dot"></span>Test <span class="count"></span></span></h2>
+          <h2 class="column-head"><span class="column-label"><span class="column-dot"></span><span data-status-name="test">Test</span> <span class="count"></span></span></h2>
           <ul class="list"></ul>
           <p class="empty"></p>
         </section>
         <section class="column" data-status="done">
           <h2 class="column-head">
-            <span class="column-label"><span class="column-dot"></span>Done <span class="count"></span></span>
+            <span class="column-label"><span class="column-dot"></span><span data-status-name="done">Done</span> <span class="count"></span></span>
             <button type="button" class="clear-done" id="clearDone" hidden>Clear</button>
           </h2>
           <ul class="list"></ul>
@@ -109,8 +109,8 @@
       <form class="sheet-body" id="addForm" autocomplete="off">
         <div class="add-options">
           <div class="segmented" id="addStatus" role="radiogroup" aria-label="Add to">
-            <button type="button" role="radio" data-status="todo">Todo</button>
-            <button type="button" role="radio" data-status="test">Test</button>
+            <button type="button" role="radio" data-status="todo"><span data-status-name="todo">Todo</span></button>
+            <button type="button" role="radio" data-status="test"><span data-status-name="test">Test</span></button>
           </div>
           <!-- bug, feature or other (js/tracker/kind-picker.js) -->
           <div class="kinds" id="addKind" role="radiogroup" aria-label="Kind"></div>
@@ -119,6 +119,9 @@
           <input type="text" class="text-input" id="addText" maxlength="300" enterkeyhint="send" spellcheck="true" aria-label="New item">
           <button type="submit" class="add-send" id="addSend" aria-label="Add"></button>
         </div>
+        <!-- 3D printing projects: the file to print (optional) -->
+        <input type="text" class="text-input add-link" id="addLink" maxlength="300" autocomplete="off" autocapitalize="off"
+          spellcheck="false" enterkeyhint="send" placeholder="Link to the file to print (optional)" aria-label="Link to the file to print" hidden>
         <button type="button" class="add-note-toggle" id="addNoteToggle" aria-expanded="false" aria-controls="addNote"></button>
         <textarea class="item-note-input add-note" id="addNote" rows="2" maxlength="2000" hidden
           placeholder="Notes: how to test it, links, anything…" aria-label="Notes"></textarea>
@@ -138,7 +141,14 @@
       </div>
       <div class="sheet-body">
         <textarea class="item-text-input" id="itemText" rows="1" maxlength="300" aria-label="What"></textarea>
-        <!-- a test only gets its two answers, with its notes to read (js/tracker/item-sheet.js) -->
+        <!-- 3D printing projects: the file to print, ready to copy -->
+        <div class="link-field" id="itemLinkRow" hidden>
+          <input type="text" id="itemLink" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false"
+            enterkeyhint="done" placeholder="Link to the file to print" aria-label="Link to the file to print">
+          <button type="button" class="link-copy" id="itemLinkCopy"></button>
+        </div>
+        <!-- a test only gets its two answers, and a done item no kind or backlog: their notes are there to read
+             (js/tracker/item-sheet.js) -->
         <p class="item-note-view" id="itemNoteView" hidden></p>
         <div class="test-answers" id="itemAnswers" hidden>
           <button type="button" class="answer passed" id="itemPassed"></button>
@@ -151,9 +161,9 @@
           <button type="button" class="pill primary" id="itemFailSend"></button>
         </div>
         <div class="segmented" id="itemStatus" role="radiogroup" aria-label="Status">
-          <button type="button" role="radio" data-status="todo">Todo</button>
-          <button type="button" role="radio" data-status="test">Test</button>
-          <button type="button" role="radio" data-status="done">Done</button>
+          <button type="button" role="radio" data-status="todo"><span data-status-name="todo">Todo</span></button>
+          <button type="button" role="radio" data-status="test"><span data-status-name="test">Test</span></button>
+          <button type="button" role="radio" data-status="done"><span data-status-name="done">Done</span></button>
         </div>
         <button type="button" class="backlog-move" id="itemBacklog"></button>
         <div class="kinds item-kinds" id="itemKind" role="radiogroup" aria-label="Kind"></div>
@@ -236,6 +246,12 @@
           placeholder="Use your emoji keyboard 😀">
         <p class="settings-label">Color</p>
         <div class="hues" id="projectHues" role="radiogroup" aria-label="Color"></div>
+        <!-- what kind of project: code, with its GitHub repo, or 3D printing (lists Todo, To print and Printed; items
+             get a link to the file). Starts on GitHub. -->
+        <div class="segmented project-type" id="projectType" role="radiogroup" aria-label="Project type">
+          <button type="button" role="radio" data-type="code"></button>
+          <button type="button" role="radio" data-type="print"></button>
+        </div>
         <label class="settings-label" for="projectUrl">GitHub repo (optional)</label>
         <div class="repo-field">
           <span class="repo-prefix" aria-hidden="true">github.com/</span>

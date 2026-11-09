@@ -13,10 +13,8 @@ export function ago(time, now = Date.now()) {
   return new Date(time).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
-/** A full date and time, for the item sheet. */
-export const dateTime = (time) => new Date(time).toLocaleString(undefined, {
-  day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-});
+/** A day, without the time, for the item sheet: "15 Oct 2026". */
+export const date = (time) => new Date(time).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
 /** "1 item", "3 items". */
 export const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;

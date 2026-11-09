@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   cleanUrl, EMOJIS, firstEmoji, githubRepo, githubUrl, HUES, isEmoji, isOpen, MAX_ITEMS, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, nextStatus, PERSON_EMOJIS, pickEmoji,
+  statusLabel,
 } from '../public/js/shared/tracker.js';
 import { ACTION_TYPES, ActionError, applyAction } from '../src/tracker/actions.js';
 import { createInitialState } from '../src/tracker/state.js';
@@ -136,7 +137,7 @@ test('items are added to do by default, or as ready to test', () => {
   const { state, projectId } = setup();
   const { itemId } = act(state, { type: 'addItem', projectId, text: '  Fix   the login  ' });
   act(state, { type: 'addItem', projectId, text: 'Dark mode', status: 'test', note: 'Settings → Theme' });
-  assert.deepEqual(state.items[0], { id: itemId, projectId, text: 'Fix the login', note: '', status: 'todo', kind: 'other', createdAt: T0, movedAt: T0, rank: -T0 });
+  assert.deepEqual(state.items[0], { id: itemId, projectId, text: 'Fix the login', note: '', link: '', status: 'todo', kind: 'other', createdAt: T0, movedAt: T0, rank: -T0 });
   assert.equal(state.items[1].status, 'test');
   assert.equal(state.items[1].note, 'Settings → Theme');
 });
@@ -318,7 +319,30 @@ test('an item is a bug, a feature or other: picked when adding, changed when edi
 test('the actions are the ones the docs list', () => {
   assert.deepEqual([...ACTION_TYPES].sort(), ['addItem', 'addPerson', 'addProject', 'clearDone', 'editItem', 'removeItem',
     'removePerson', 'removeProject', 'renamePerson', 'renameProject', 'reorderItem', 'setPersonEmoji', 'setProjectEmoji', 'setProjectHue',
-    'setProjectUrl', 'setStatus']);
+    'setProjectPrint', 'setProjectUrl', 'setStatus']);
+});
+
+test('a 3D printing project: off by default, switched on and off; its items keep a link to the file', () => {
+  const { state, projectId } = setup();
+  assert.equal(state.projects[0].print, false);
+  act(state, { type: 'setProjectPrint', projectId, print: true });
+  assert.equal(state.projects[0].print, true);
+  rejects(state, { type: 'setProjectPrint', projectId, print: 'yes' });
+  const { projectId: printer } = act(state, { type: 'addProject', name: 'Shelf parts', print: true });
+  assert.equal(state.projects.find((p) => p.id === printer).print, true);
+  rejects(state, { type: 'addProject', name: 'Other', print: 1 });
+
+  const { itemId } = act(state, { type: 'addItem', projectId: printer, text: 'Bracket', link: ' https://www.printables.com/model/1 ' });
+  assert.equal(state.items[0].link, 'https://www.printables.com/model/1');
+  act(state, { type: 'editItem', itemId, link: '\\\\nas\\models\\bracket.3mf' });          // a path is fine too
+  assert.equal(state.items[0].link, '\\\\nas\\models\\bracket.3mf');
+  act(state, { type: 'editItem', itemId, text: 'Bracket v2' });                           // left out: kept
+  assert.equal(state.items[0].link, '\\\\nas\\models\\bracket.3mf');
+  act(state, { type: 'editItem', itemId, link: '' });
+  assert.equal(state.items[0].link, '');
+  assert.equal(statusLabel('test', state.projects.find((p) => p.id === printer)), 'To print');
+  assert.equal(statusLabel('done', { print: true }), 'Printed');
+  assert.equal(statusLabel('test', { print: false }), 'Test');
 });
 
 test('unknown or malformed actions are rejected', () => {

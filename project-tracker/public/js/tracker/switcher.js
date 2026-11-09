@@ -58,12 +58,13 @@ export function renderProjectButton(project) {
   button.hidden = !project;
   $('appName').hidden = Boolean(project);
   const repo = /** @type {HTMLAnchorElement} */ ($('repoLink'));
-  repo.hidden = !project?.url;
-  if (project?.url && repo.href !== project.url) {
-    repo.href = project.url;
-    repo.innerHTML = icon(githubRepo(project.url) ? 'github' : 'code');
-    repo.title = `Open ${shortUrl(project.url)}`;
-    repo.setAttribute('aria-label', `Open the repo, ${shortUrl(project.url)}`);
+  const url = project?.print ? null : project?.url;   // 3D printing projects show no repo
+  repo.hidden = !url;
+  if (url && repo.href !== url) {
+    repo.href = url;
+    repo.innerHTML = icon(githubRepo(url) ? 'github' : 'code');
+    repo.title = `Open ${shortUrl(url)}`;
+    repo.setAttribute('aria-label', `Open the repo, ${shortUrl(url)}`);
   }
   if (!project) return;
   button.innerHTML = `<span class="project-emoji">${escapeHtml(project.emoji)}</span><span class="project-button-name">${escapeHtml(project.name)}</span>${icon('chevron')}`;

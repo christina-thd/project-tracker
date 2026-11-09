@@ -1,5 +1,5 @@
-// A project: adding a new one, or renaming it, setting its repo link, picking its emoji and color, clearing its done items and
-// deleting it.
+// A project: adding a new one, or renaming it, setting its repo link, picking its emoji and color, making it a 3D printing
+// one, clearing its done items and deleting it.
 // A new project's emoji follows its name as you type (pickEmoji), until you pick one yourself.
 import { sendAction } from '../shared/api.js';
 import { $, closest } from '../shared/dom.js';
@@ -28,6 +28,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
   const remove = $('projectDelete');
   const clear = $('projectClear');
   const custom = /** @type {HTMLInputElement} */ ($('projectEmojiCustom'));
+  let printing = false;                            // a 3D printing project (else code, with a GitHub repo)
   let projectId = null;                            // null: a new project
   let hue = 0;
   let emojiChosen = false;                         // picked by hand: typing the name no longer changes it
@@ -46,7 +47,20 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     },
   });
 
-  const urlChanged = () => url.value.trim() !== urlShown;
+  // a 3D printing project has no GitHub repo field: what's in it is left as it was
+  const urlChanged = () => !printing && url.value.trim() !== urlShown;
+
+  /** GitHub or 3D printing picked; the GitHub repo field shows only for GitHub (css/tracker.css .printing). */
+  function renderType() {
+    for (const button of $('projectType').querySelectorAll('[data-type]')) {
+      const selected = button instanceof HTMLElement && (button.dataset.type === 'print') === printing;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-checked', String(selected));
+    }
+    $('projectForm').classList.toggle('printing', printing);
+  }
+  $('projectType').querySelector('[data-type="code"]').innerHTML = `${icon('github')}<span>GitHub</span>`;
+  $('projectType').querySelector('[data-type="print"]').innerHTML = `${icon('cube')}<span>3D printing</span>`;
 
   /** A GitHub field that isn't a repo: says so (and returns true). */
   function badUrl() {
@@ -76,7 +90,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     }
   }
 
-  /** Undo of "Saved": the project's name, link, emoji and color as they were. */
+  /** Undo of "Saved": the project's name, link, emoji, color and 3D printing as they were. */
   async function restore(old) {
     const project = getProjects().find((p) => p.id === old.id);
     if (!project) return;
@@ -85,6 +99,7 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       if (project.url !== old.url) await sendAction({ type: 'setProjectUrl', projectId: old.id, url: old.url ?? '' });
       if (project.emoji !== old.emoji) await sendAction({ type: 'setProjectEmoji', projectId: old.id, emoji: old.emoji });
       if (project.hue !== old.hue) await sendAction({ type: 'setProjectHue', projectId: old.id, hue: old.hue });
+      if (project.print !== old.print) await sendAction({ type: 'setProjectPrint', projectId: old.id, print: old.print });
     } catch (err) {
       toastError(err);
     }
@@ -164,6 +179,17 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
     sendAction({ type: 'setProjectHue', projectId, hue }).catch(toastError);
   });
 
+  // GitHub or 3D printing: right away for an existing project (like its emoji and color)
+  $('projectType').addEventListener('click', (e) => {
+    const button = closest(e, '[data-type]');
+    if (!button || (button.dataset.type === 'print') === printing) return;
+    printing = button.dataset.type === 'print';
+    renderType();
+    if (!projectId) return;
+    edited = true;
+    sendAction({ type: 'setProjectPrint', projectId, print: printing }).catch(toastError);
+  });
+
   $('projectForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const value = name.value.trim();
@@ -175,7 +201,8 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
         sheet.close();                             // saves the name and link (saveTyped)
       } else {
         const { projectId: created } = await sendAction({
-          type: 'addProject', personId: getPersonId(), name: value, emoji: emoji.value, hue, url: githubUrl(url.value),
+          type: 'addProject', personId: getPersonId(), name: value, emoji: emoji.value, hue, url: printing ? null : githubUrl(url.value),
+          print: printing,
         });
         sheet.close();
         toast(`Added ${value}`, { icon: 'check', action: { label: 'Undo', run: () => unadd(created) } });
@@ -231,6 +258,8 @@ export function createProjectSheet({ getPersonId, getProjects, getItems, onCreat
       emojiChosen = false;
       showEmoji(project?.emoji ?? pickEmoji(getProjects()));
       name.value = project?.name ?? '';
+      printing = project?.print ?? false;          // new projects start on GitHub
+      renderType();
       // a GitHub repo as you/project; any other link (set through the API) as it is, without https://
       urlShown = project?.url ? githubRepo(project.url) ?? shortUrl(project.url) : '';
       url.value = urlShown;

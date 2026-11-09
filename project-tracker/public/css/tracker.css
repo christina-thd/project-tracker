@@ -435,6 +435,44 @@ body.reordering { -webkit-user-select: none; user-select: none; cursor: grabbing
 
 /* a test's sheet: nothing to edit or move elsewhere, just its notes to read and the two answers */
 .item-sheet.testing :is(#itemStatus, #itemBacklog, #itemKind, #itemNote, .item-actions) { display: none; }
+/* a done item: no kind or backlog, and its notes just to read */
+.item-sheet.finished :is(#itemBacklog, #itemKind, #itemNote) { display: none; }
+
+/* the file to print (3D printing projects): the link, and Copy */
+.link-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.link-field input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-size: 13px;
+}
+.link-field input::placeholder { color: var(--faint); }
+.link-field input:read-only { color: var(--muted); }
+.link-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.link-copy svg.icon { width: 15px; height: 15px; }
+.link-copy:active { transform: scale(0.95); }
 .item-sheet.testing .item-text-input { pointer-events: none; }
 .item-note-view {
   margin: 0;
@@ -489,6 +527,7 @@ body.reordering { -webkit-user-select: none; user-select: none; cursor: grabbing
 .add-sheet .sheet-title span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .add-row { display: flex; gap: 8px; }
 .add-row .text-input { flex: 1; min-width: 0; }
+.add-link { font-size: 13px; }                     /* 3D printing projects: the file to print */
 .add-send {
   display: grid;
   place-items: center;
@@ -688,6 +727,13 @@ body.reordering { -webkit-user-select: none; user-select: none; cursor: grabbing
 }
 .hue.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px hsl(var(--hue) 80% 68%); }
 .hue:active { transform: scale(0.9); }
+
+/* the kind of project, in the project sheet: GitHub (code, with its repo) or 3D printing; small, on the left */
+.project-type { align-self: flex-start; font-size: 13px; }
+.project-type > button { gap: 6px; padding: 6px 14px; }
+.project-type svg.icon { width: 14px; height: 14px; }
+/* a 3D printing project has no GitHub repo (js/tracker/project-sheet.js) */
+.printing :is(label[for="projectUrl"], .repo-field) { display: none; }
 
 /* type-the-name confirmation (js/ui/confirm.js) */
 .confirm-text { margin: 0; line-height: 1.45; }

@@ -1,6 +1,6 @@
 # Project Tracker
 
-Keep track of what's to do and what's ready to test, for every project you're working on.
+Keep track of what's to do and what's ready to test (or to print), for every project you're working on.
 
 ## Getting started
 
@@ -36,8 +36,22 @@ Tap the round button in front of an item to move it to the next list: Todo → T
 A message at the bottom offers **Undo** for a few seconds; tap the message to dismiss it. Saving or adding an item,
 a project or a person shows one too, with **Undo** to put it back as it was.
 
-Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list
-(e.g. back to Todo when a test fails), then tap **Save**. **Close** leaves without saving. **Delete** removes it.
+Tap the item itself to open it: change its text, add notes (how to test it, a link, …), or move it to any list,
+then tap **Save**. **Close** leaves without saving. **Delete** removes it.
+
+Drag a Todo item by the dots on its right to put it in another order: the order is kept, on every screen. New items,
+and items moved back to Todo, go on top.
+
+### Testing
+
+An item in **Test** opens for testing: its text and notes to read, and two buttons.
+
+- **Passed** moves it to Done.
+- **Didn't pass** opens a box for what went wrong; **Move to Todo** adds that to its notes, with the date, and sends it
+  back to Todo.
+
+Both offer **Undo** in the message at the bottom. A **Done** item has no kind or backlog, and its notes are there to
+read; it can still be moved to another list, changed and saved, or deleted.
 
 ## The backlog
 
@@ -66,13 +80,26 @@ there's a search field too: type part of a name and press Enter to jump to the f
 Inside a project, its name is at the top: tap it for the same list in a sheet, to switch quickly. The bar at the top,
 with the Todo, Test and Done tabs, stays in place while you scroll.
 
-In both lists, **⋯** next to a project renames it, sets its GitHub repo, changes its emoji or color, clears its done items,
+In both lists, **⋯** next to a project renames it, sets its GitHub repo or makes it a 3D printing project, changes its
+emoji or color, clears its done items,
 or deletes it (with everything in it: type **delete** to confirm, since it can't be undone). **New project** at the
 bottom adds one and opens it.
 
 A project with a **GitHub repo** shows GitHub's logo next to its name at the top, and on its row in the project list: tap it
-to open the repo. Set it at the
-bottom of the project's sheet: type `you/project` after `github.com/`, or paste the repo's link.
+to open the repo. Set it at the bottom of the project's sheet, with **GitHub** picked: type `you/project` after
+`github.com/`, or paste the repo's link.
+
+### 3D printing projects
+
+Pick **3D printing** instead of **GitHub** at the bottom of the project's sheet (new projects start on GitHub). Then:
+
+- its lists are **Todo**, **To print** and **Printed**;
+- every item can have a **link to the file to print** (a web address or a path), added with the item or in its sheet,
+  with **Copy** to paste it into your slicer; items with one show 🔗 in the list;
+- an item in To print opens with **Printed** and **Print failed**, like a test (Print failed goes back to Todo with
+  your note).
+
+Pick GitHub again to turn it back into a normal project; nothing in it is lost.
 
 Every project has an **emoji**, shown next to its name. When you add a project, one is suggested from its name as you
 type ("Garden sensors" → 🌱, "Budget" → 💰); if nothing fits, it's one no other project uses yet. Pick another from

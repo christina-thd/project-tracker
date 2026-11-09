@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import {
-  cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, pickEmoji, pickHue,
+  cleanUrl, DEFAULT_KIND, isEmoji, isHue, KIND_IDS, MAX_ITEMS, MAX_NAME, MAX_NOTE, MAX_PEOPLE, MAX_PROJECTS, MAX_TEXT, MAX_URL, pickEmoji, pickHue,
   ITEM_STATUS_IDS, pickPersonEmoji,
 } from '../../public/js/shared/tracker.js';
 
@@ -9,7 +9,8 @@ import {
  *   people    Person[] (public/js/shared/tracker.js), in the order they were added
  *   projects  Project[], each one person's, in the order they were added
  *   items     Item[], each in one project
- * Schema 1 had no people: its projects go to a first person, "Me" (see normalizeState).
+ * Schema 1 had no people: its projects go to a first person, "Me" (see normalizeState). Fields added since (an item's
+ * kind, rank and link, a project's print) get their defaults on load.
  */
 export const SCHEMA_VERSION = 2;
 
@@ -61,6 +62,7 @@ function normalizeProject(raw, now, taken) {
     emoji: isEmoji(raw.emoji) ? raw.emoji : pickEmoji(taken, name),   // from before emoji: one its name suggests
     hue: isHue(raw.hue) ? raw.hue : pickHue(taken),
     url: cleanUrl(raw.url) || null,                // none (or not a web address): null
+    print: raw.print === true,                     // from before 3D printing: not one
     createdAt: toTime(raw.createdAt, now),
   };
 }
@@ -76,6 +78,7 @@ function normalizeItem(raw, now, projectIds) {
     projectId: raw.projectId,
     text,
     note: cleanText(raw.note, MAX_NOTE, { multiline: true }),
+    link: cleanText(raw.link, MAX_URL),
     status: ITEM_STATUS_IDS.includes(raw.status) ? raw.status : 'todo',
     kind: KIND_IDS.includes(raw.kind) ? raw.kind : DEFAULT_KIND,   // from before kinds: other
     createdAt,

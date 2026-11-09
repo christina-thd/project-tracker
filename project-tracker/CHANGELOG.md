@@ -3,6 +3,7 @@
 ## 2.2.0
 - Drag Todo items into any order
 - A test that didn't pass goes back to Todo with what went wrong
+- 3D printing projects, with a link to the file on every item
 - Fix: + button and toasts too high on iPhone
 
 ## 2.1.0

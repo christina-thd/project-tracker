@@ -15,10 +15,10 @@ test('a saved tracker comes back as it was', () => {
   const saved = {
     schema: SCHEMA_VERSION,
     people: [{ id: 'ab', name: 'Chris', emoji: '🦊', createdAt: NOW - 20 }],
-    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', createdAt: NOW - 10 }],
+    projects: [{ id: 'aa', personId: 'ab', name: 'Website', emoji: '🚀', hue: 230, url: 'https://github.com/me/site', print: true, createdAt: NOW - 10 }],
     items: [
-      { id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1, rank: 3 },
-      { id: 'cd', projectId: 'aa', text: 'Later', note: '', status: 'backlog', kind: 'other', createdAt: NOW - 5, movedAt: NOW - 2, rank: -(NOW - 2) },
+      { id: 'bb', projectId: 'aa', text: 'Fix', note: 'a\nb', link: 'https://example.com/a.stl', status: 'test', kind: 'bug', createdAt: NOW - 5, movedAt: NOW - 1, rank: 3 },
+      { id: 'cd', projectId: 'aa', text: 'Later', note: '', link: '', status: 'backlog', kind: 'other', createdAt: NOW - 5, movedAt: NOW - 2, rank: -(NOW - 2) },
     ],
   };
   assert.deepEqual(normalizeState(structuredClone(saved), NOW), saved);
